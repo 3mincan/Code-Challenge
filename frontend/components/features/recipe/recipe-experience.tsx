@@ -16,12 +16,14 @@ import { CookingProgress } from "./cooking-progress"
 import { IngredientsPanel } from "./ingredients-panel"
 import { RecipeHeader } from "./recipe-header"
 import { getCurrentStepIndex } from "./recipe-utils"
+import { RecipeChefAssistant } from "./recipe-chef-assistant"
 import { StepsPanel } from "./steps-panel"
 
 type RecipeExperienceProps = {
   originalState: RecipeContext | null
   running: boolean
   state: RecipeContext
+  threadId: string | null
   onToggleIngredient: (ingredientName: string) => void
 }
 
@@ -29,6 +31,7 @@ function RecipeExperience({
   originalState,
   running,
   state,
+  threadId,
   onToggleIngredient,
 }: RecipeExperienceProps) {
   const [cookingMode, setCookingMode] = useState(false)
@@ -160,6 +163,7 @@ function RecipeExperience({
             )}
           </Container>
         </Section>
+        <RecipeChefAssistant state={state} threadId={threadId} />
       </ShellMain>
     </AppShell>
   )

@@ -12,8 +12,14 @@ import { useRecipeCoAgent } from "@/hooks/use-recipe-coagent"
 import { RecipeExperience } from "./recipe-experience"
 
 function RecipeHome() {
-  const { isHydrating, originalState, running, state, toggleIngredient } =
-    useRecipeCoAgent()
+  const {
+    isHydrating,
+    originalState,
+    running,
+    state,
+    threadId,
+    toggleIngredient,
+  } = useRecipeCoAgent()
 
   if (isHydrating) {
     return (
@@ -51,6 +57,7 @@ function RecipeHome() {
             originalState={originalState}
             running={running}
             state={state}
+            threadId={threadId}
             onToggleIngredient={toggleIngredient}
           />
         </motion.div>
