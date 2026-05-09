@@ -123,7 +123,7 @@ function getRecipeChefChatProps(): Pick<
           "cpk:min-h-11 cpk:min-w-11 cpk:shrink-0 cpk:rounded-xl cpk:touch-manipulation"
         ),
       },
-      showDisclaimer: false,
+      showDisclaimer: true,
     },
     suggestionView: {
       container: {

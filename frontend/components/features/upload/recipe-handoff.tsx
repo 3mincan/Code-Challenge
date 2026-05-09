@@ -28,7 +28,32 @@ function RecipeHandoff({ response, onReset }: RecipeHandoffProps) {
   const recipe = state.recipe ?? response.state.recipe
 
   if (!recipe) {
-    return null
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
+        className="space-y-5"
+      >
+        <Surface
+          variant="base"
+          elevation="card"
+          className="space-y-4 p-6 sm:p-8"
+        >
+          <Text variant="small-medium" measure="none">
+            Recipe preview unavailable
+          </Text>
+          <Text variant="small" measure="none" tone="muted">
+            The upload succeeded, but we could not show the recipe summary.
+            You can try uploading the file again, or continue if the workspace
+            opens on the next screen.
+          </Text>
+          <Button variant="secondary" onClick={onReset}>
+            Upload again
+          </Button>
+        </Surface>
+      </motion.div>
+    )
   }
 
   const totalTime =

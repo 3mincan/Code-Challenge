@@ -1,18 +1,9 @@
 import { env } from "@/config/env"
+import { ApiError } from "@/lib/api/api-error"
+import { getUserFacingApiMessage } from "@/lib/errors/user-message"
 
 type ApiRequestOptions = RequestInit & {
   searchParams?: Record<string, string | number | boolean | undefined>
-}
-
-class ApiError extends Error {
-  constructor(
-    message: string,
-    readonly status: number,
-    readonly body: unknown
-  ) {
-    super(message)
-    this.name = "ApiError"
-  }
 }
 
 function createApiUrl(
@@ -55,7 +46,11 @@ async function apiFetch<TResponse>(
   const body = await readResponseBody(response)
 
   if (!response.ok) {
-    throw new ApiError(response.statusText, response.status, body)
+    throw new ApiError(
+      getUserFacingApiMessage(response.status, body),
+      response.status,
+      body
+    )
   }
 
   return body as TResponse

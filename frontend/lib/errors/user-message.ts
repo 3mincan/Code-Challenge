@@ -1,0 +1,145 @@
+import { ApiError } from "@/lib/api/api-error"
+
+type ErrorKind = "client" | "network" | "timeout" | "server" | "unknown"
+
+/** FastAPI / Starlette style: `detail` string, or list of validation objects. */
+function parseFastApiDetail(body: unknown): string | null {
+  if (!body || typeof body !== "object") {
+    return null
+  }
+
+  const record = body as Record<string, unknown>
+  const detail = record.detail
+
+  if (typeof detail === "string") {
+    return normaliseTechnicalPhrases(detail)
+  }
+
+  if (Array.isArray(detail)) {
+    const messages = detail
+      .map((item) => {
+        if (!item || typeof item !== "object") {
+          return null
+        }
+        const row = item as Record<string, unknown>
+        if (typeof row.msg === "string") {
+          return row.msg
+        }
+        return null
+      })
+      .filter((item): item is string => Boolean(item))
+
+    if (messages.length > 0) {
+      return normaliseTechnicalPhrases(messages.join(" "))
+    }
+  }
+
+  return null
+}
+
+/** Turn occasional backend phrases into calmer copy without dumping internals. */
+function normaliseTechnicalPhrases(message: string): string {
+  const trimmed = message.trim()
+  if (!trimmed) {
+    return ""
+  }
+  if (/connection refused|econnrefused|networkError|Failed to fetch/i.test(trimmed)) {
+    return "We could not reach the recipe service. Check that it is running, then try again."
+  }
+  return trimmed
+}
+
+function getStatusFallbackMessage(status: number): string | null {
+  if (status === 400) {
+    return "That file could not be read as a recipe. Try a PDF or a text file with ingredients and steps."
+  }
+  if (status === 413) {
+    return "That file is too large for this upload. Try a smaller file or paste the recipe into a text file."
+  }
+  if (status === 429) {
+    return "Too many requests right now. Wait a moment and try again."
+  }
+  if (status === 401 || status === 403) {
+    return "Access was denied. If you are using an API key, check your setup."
+  }
+  if (status === 404) {
+    return "The recipe service could not find what it needed. Check the API address in your settings."
+  }
+  if (status >= 500 && status < 600) {
+    if (status === 502 || status === 503 || status === 504) {
+      return "The recipe service is temporarily unavailable. Try again shortly."
+    }
+    return "The recipe service hit a problem. Wait a moment and try again."
+  }
+  return null
+}
+
+function getUserFacingApiMessage(status: number, body: unknown): string {
+  const fromBody = parseFastApiDetail(body)
+  if (fromBody) {
+    return fromBody
+  }
+
+  return (
+    getStatusFallbackMessage(status) ??
+    "Something went wrong talking to the recipe service."
+  )
+}
+
+function classifyError(error: unknown): ErrorKind {
+  if (error instanceof ApiError) {
+    if (error.status === 408 || /timeout/i.test(error.message)) {
+      return "timeout"
+    }
+    if (error.status >= 500 || error.status === 502 || error.status === 503) {
+      return "server"
+    }
+    if (error.status >= 400 && error.status < 500) {
+      return "client"
+    }
+  }
+
+  if (error instanceof TypeError && error.message === "Failed to fetch") {
+    return "network"
+  }
+
+  if (error instanceof Error) {
+    const msg = error.message.toLowerCase()
+    if (msg.includes("timeout") || msg.includes("too long")) {
+      return "timeout"
+    }
+    if (
+      msg.includes("could not reach") ||
+      msg.includes("network") ||
+      msg.includes("failed to fetch")
+    ) {
+      return "network"
+    }
+  }
+
+  return "unknown"
+}
+
+function getUserFacingMessage(error: unknown): string {
+  if (error instanceof ApiError) {
+    return getUserFacingApiMessage(error.status, error.body)
+  }
+
+  if (error instanceof Error) {
+    const cleaned = normaliseTechnicalPhrases(error.message)
+    if (cleaned) {
+      return cleaned
+    }
+  }
+
+  return "Something unexpected happened. You can try again in a moment."
+}
+
+export {
+  classifyError,
+  getUserFacingApiMessage,
+  getUserFacingMessage,
+  getStatusFallbackMessage,
+  parseFastApiDetail,
+}
+export type { ErrorKind }

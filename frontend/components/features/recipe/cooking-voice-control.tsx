@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { TactileButton } from "@/components/ui/tactile-button"
 import { Text } from "@/components/ui/typography"
 import { routeCookingVoiceCommand } from "@/lib/cooking-voice-commands"
+import { getUserFacingMessage } from "@/lib/errors/user-message"
 import { cn } from "@/lib/utils"
 import { useVoiceTranscription } from "@/hooks/use-voice-transcription"
 
@@ -62,8 +63,8 @@ function CookingVoiceControl({
           content: route.message,
         })
         announce("Sent to Chef")
-      } catch {
-        announce("Could not reach Chef — try again")
+      } catch (err) {
+        announce(getUserFacingMessage(err))
       }
     },
     [

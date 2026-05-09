@@ -113,12 +113,16 @@ function useRecipeCoAgent() {
     [coagent]
   )
 
+  const incompleteSession =
+    status === "ready" && Boolean(syncedThreadId) && !coagent.state.recipe
+
   return useMemo(
     () => ({
       error:
         status === "missing-session"
           ? "Upload a recipe before starting the cooking workspace."
           : null,
+      incompleteSession,
       isHydrating: status === "hydrating",
       isReady: status === "ready",
       originalState,
@@ -139,6 +143,7 @@ function useRecipeCoAgent() {
       coagent.start,
       coagent.state,
       coagent.stop,
+      incompleteSession,
       originalState,
       status,
       syncedThreadId,

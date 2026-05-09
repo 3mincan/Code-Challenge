@@ -1,4 +1,6 @@
-import { ApiError, createApiUrl } from "@/lib/api/client"
+import { ApiError } from "@/lib/api/api-error"
+import { createApiUrl } from "@/lib/api/client"
+import { getUserFacingApiMessage } from "@/lib/errors/user-message"
 import type { UploadRecipeResponse } from "@/types/recipe"
 
 type UploadRecipeOptions = {
@@ -14,17 +16,8 @@ function parseBody(value: string) {
   }
 }
 
-function getErrorMessage(statusText: string, body: unknown) {
-  if (
-    body &&
-    typeof body === "object" &&
-    "detail" in body &&
-    typeof body.detail === "string"
-  ) {
-    return body.detail
-  }
-
-  return statusText || "Upload failed"
+function getUploadErrorMessage(status: number, body: unknown): string {
+  return getUserFacingApiMessage(status, body)
 }
 
 function uploadRecipeDocument({
@@ -51,7 +44,7 @@ function uploadRecipeDocument({
       if (request.status < 200 || request.status >= 300) {
         reject(
           new ApiError(
-            getErrorMessage(request.statusText, body),
+            getUploadErrorMessage(request.status, body),
             request.status,
             body
           )
@@ -65,12 +58,18 @@ function uploadRecipeDocument({
 
     request.onerror = () => {
       reject(
-        new Error("Could not reach the recipe service. Is the backend running?")
+        new Error(
+          "We could not reach the recipe service. Check that it is running and you are online, then try again."
+        )
       )
     }
 
     request.ontimeout = () => {
-      reject(new Error("The upload took too long. Please try again."))
+      reject(
+        new Error(
+          "This is taking longer than expected. Check your connection and try again."
+        )
+      )
     }
 
     request.timeout = 120_000

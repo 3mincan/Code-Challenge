@@ -185,7 +185,8 @@ function RecipeChefAssistant({ state, threadId }: RecipeChefAssistantProps) {
         chatToggleOpenLabel: "Open Ask Chef",
         chatToggleCloseLabel: "Close Ask Chef",
         chatInputPlaceholder: "Ask about this recipe…",
-        chatDisclaimerText: "",
+        chatDisclaimerText:
+          "If Chef stops replying, close and reopen the chat. Check that the recipe service is running.",
       }}
     />
   )

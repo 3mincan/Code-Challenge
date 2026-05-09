@@ -3,18 +3,27 @@
 import { AnimatePresence, motion } from "framer-motion"
 import { FileUp, Sparkles } from "lucide-react"
 
-import { AppShell, ShellMain } from "@/components/layout/app-shell"
+import { ConnectionBanner } from "@/components/feedback/connection-banner"
 import { RecipeHandoff } from "@/components/features/upload/recipe-handoff"
 import { RecipeLoadingSkeleton } from "@/components/features/upload/recipe-loading-skeleton"
 import { UploadDropzone } from "@/components/features/upload/upload-dropzone"
 import { UploadProgress } from "@/components/features/upload/upload-progress"
+import { AppShell, ShellMain } from "@/components/layout/app-shell"
+import { Button } from "@/components/ui/button"
 import { Container, Section, Stack } from "@/components/ui/section"
 import { Surface } from "@/components/ui/surface"
 import { Text } from "@/components/ui/typography"
+import { useOnlineStatus } from "@/hooks/use-online-status"
 import { useRecipeUpload } from "@/hooks/use-recipe-upload"
+import { clearRecipeSession } from "@/lib/recipe-session"
 
-function UploadExperience() {
+type UploadExperienceProps = {
+  incompleteSession?: boolean
+}
+
+function UploadExperience({ incompleteSession = false }: UploadExperienceProps) {
   const {
+    canRetryUpload,
     error,
     file,
     isBusy,
@@ -22,9 +31,11 @@ function UploadExperience() {
     progress,
     reset,
     response,
+    retryUpload,
     selectFile,
     upload,
   } = useRecipeUpload()
+  const online = useOnlineStatus()
   const isSuccess = phase === "success" && response
   const progressLabel =
     phase === "parsing" ? "Reading and structuring recipe" : "Uploading recipe"
@@ -34,6 +45,33 @@ function UploadExperience() {
       <ShellMain>
         <Section spacing="hero" className="overflow-hidden">
           <Container>
+            <Stack className="gap-6 pb-2">
+              <ConnectionBanner online={online} />
+              {incompleteSession ? (
+                <Surface
+                  variant="rose"
+                  className="flex flex-col gap-3 border border-hairline p-5 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="min-w-0 space-y-1">
+                    <Text variant="small-medium" measure="none">
+                      Saved session without a recipe
+                    </Text>
+                    <Text variant="small" measure="none" tone="muted">
+                      Clear the saved session to upload again, or continue if
+                      you still have the file below.
+                    </Text>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="shrink-0"
+                    onClick={() => clearRecipeSession()}
+                  >
+                    Clear session
+                  </Button>
+                </Surface>
+              ) : null}
+            </Stack>
             <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
               <motion.div
                 initial={{ opacity: 0, y: 18 }}
@@ -83,10 +121,12 @@ function UploadExperience() {
                     className="space-y-6"
                   >
                     <UploadDropzone
+                      canRetry={canRetryUpload}
                       disabled={isBusy}
                       error={phase === "error" ? error : null}
                       file={file}
                       onFileSelect={selectFile}
+                      onRetry={retryUpload}
                       onUpload={upload}
                     />
                     <AnimatePresence>

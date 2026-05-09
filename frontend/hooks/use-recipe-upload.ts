@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query"
 import { useCallback, useMemo, useState } from "react"
 
 import { uploadRecipeDocument } from "@/lib/api/upload"
+import { getUserFacingMessage } from "@/lib/errors/user-message"
 import { storeRecipeSession } from "@/lib/recipe-session"
 import type { UploadRecipeResponse } from "@/types/recipe"
 
@@ -40,14 +41,6 @@ function getFileValidationError(file: File) {
   return null
 }
 
-function getErrorText(error: unknown) {
-  if (error instanceof Error) {
-    return error.message
-  }
-
-  return "Something went wrong while uploading the recipe."
-}
-
 function useRecipeUpload() {
   const [file, setFile] = useState<File | null>(null)
   const [phase, setPhase] = useState<UploadPhase>("idle")
@@ -81,7 +74,10 @@ function useRecipeUpload() {
   })
 
   const selectedFileError = file ? getFileValidationError(file) : null
-  const error = clientError ?? selectedFileError ?? getErrorText(mutation.error)
+  const serverMessage = mutation.error
+    ? getUserFacingMessage(mutation.error)
+    : null
+  const error = clientError ?? selectedFileError ?? serverMessage
 
   const selectFile = useCallback((nextFile: File | null) => {
     setFile(nextFile)
@@ -123,10 +119,32 @@ function useRecipeUpload() {
     mutation.mutate(file)
   }, [file, mutation])
 
+  const retryUpload = useCallback(() => {
+    if (!file) {
+      return
+    }
+
+    const validationError = getFileValidationError(file)
+    if (validationError) {
+      setClientError(validationError)
+      setPhase("error")
+      return
+    }
+
+    mutation.reset()
+    mutation.mutate(file)
+  }, [file, mutation])
+
   const response = mutation.data
+  const canRetryUpload =
+    phase === "error" &&
+    mutation.isError &&
+    Boolean(file) &&
+    (file ? getFileValidationError(file) === null : false)
 
   return useMemo(
     () => ({
+      canRetryUpload,
       error,
       file,
       isBusy: phase === "uploading" || phase === "parsing",
@@ -134,10 +152,22 @@ function useRecipeUpload() {
       progress,
       reset,
       response: response as UploadRecipeResponse | undefined,
+      retryUpload,
       selectFile,
       upload,
     }),
-    [error, file, phase, progress, reset, response, selectFile, upload]
+    [
+      canRetryUpload,
+      error,
+      file,
+      phase,
+      progress,
+      reset,
+      response,
+      retryUpload,
+      selectFile,
+      upload,
+    ]
   )
 }
 

@@ -13,6 +13,7 @@ import { RecipeExperience } from "./recipe-experience"
 
 function RecipeHome() {
   const {
+    incompleteSession,
     isHydrating,
     originalState,
     running,
@@ -70,7 +71,7 @@ function RecipeHome() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <UploadExperience />
+          <UploadExperience incompleteSession={incompleteSession} />
         </motion.div>
       )}
     </AnimatePresence>

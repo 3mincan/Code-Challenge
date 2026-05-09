@@ -12,10 +12,12 @@ import { Text } from "@/components/ui/typography"
 import { cn } from "@/lib/utils"
 
 type UploadDropzoneProps = {
+  canRetry?: boolean
   disabled?: boolean
   error?: string | null
   file: File | null
   onFileSelect: (file: File | null) => void
+  onRetry?: () => void
   onUpload: () => void
 }
 
@@ -28,10 +30,12 @@ function formatFileSize(size: number) {
 }
 
 function UploadDropzone({
+  canRetry = false,
   disabled,
   error,
   file,
   onFileSelect,
+  onRetry,
   onUpload,
 }: UploadDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -168,24 +172,57 @@ function UploadDropzone({
         </AnimatePresence>
       </motion.div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <AnimatePresence>
-          {error ? (
-            <motion.p
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              className="text-body-sm-medium text-destructive"
-            >
-              {error}
-            </motion.p>
-          ) : (
-            <p className="text-body-sm text-stone">
-              Text files work best when they contain ingredients and method
-              steps.
-            </p>
-          )}
-        </AnimatePresence>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+        <div className="min-w-0 flex-1 space-y-3">
+          <AnimatePresence mode="wait">
+            {error ? (
+              <motion.div
+                key="err"
+                role="alert"
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={transitions.quick}
+                className="rounded-xl border border-destructive/35 bg-destructive/8 px-4 py-3"
+              >
+                <Text variant="small-medium" measure="none" className="text-ink">
+                  Could not finish that upload
+                </Text>
+                <Text
+                  variant="small"
+                  measure="none"
+                  className="mt-2 text-charcoal"
+                >
+                  {error}
+                </Text>
+                {canRetry && onRetry ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      disabled={disabled}
+                      onClick={onRetry}
+                    >
+                      Try again
+                    </Button>
+                  </div>
+                ) : null}
+              </motion.div>
+            ) : (
+              <motion.p
+                key="hint"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="text-body-sm text-stone"
+              >
+                Text files work best when they contain ingredients and method
+                steps.
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
         <TactileButton
           type="button"
           size="lg"
