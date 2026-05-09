@@ -17,12 +17,15 @@ type StepsPanelProps = {
   steps: RecipeStep[]
   /** Wider rhythm and stronger focus on the active step (cooking mode). */
   immersive?: boolean
+  /** Agent mutating recipe/progress — light frame emphasis on the panel. */
+  agentBusy?: boolean
 }
 
 function StepsPanel({
   currentStepIndex,
   steps,
   immersive = false,
+  agentBusy = false,
 }: StepsPanelProps) {
   const stepRefs = useRef<(HTMLLIElement | null)[]>([])
 
@@ -49,12 +52,15 @@ function StepsPanel({
 
   return (
     <motion.section
+      layout
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.14, duration: 0.36, ease: stepEase }}
       className={cn(
         "rounded-xl border border-hairline bg-canvas p-5 shadow-elevation-1 sm:p-6",
-        immersive && "shadow-elevation-2"
+        immersive && "shadow-elevation-2",
+        "transition-[box-shadow,ring] duration-300",
+        agentBusy && "ring-1 ring-primary/20 shadow-elevation-2"
       )}
       aria-label="Cooking steps"
     >
@@ -119,7 +125,7 @@ function StepsPanel({
           const shellClass = cn(
             "rounded-xl border p-4 sm:p-5 transition-[border-color,box-shadow,background-color] duration-300",
             isCurrent &&
-              "border-primary bg-tint-yellow shadow-elevation-2 ring-1 ring-primary/15",
+              "border-primary bg-tint-yellow shadow-elevation-2",
             isCompleted &&
               !isCurrent &&
               "border-hairline bg-surface-soft/80 shadow-elevation-1",
@@ -138,19 +144,31 @@ function StepsPanel({
 
           return (
             <motion.li
-              layout
-              key={`${step.step_number}-${index}`}
+              layout="position"
+              key={step.step_number}
               ref={(el) => {
                 stepRefs.current[index] = el
               }}
               data-step-index={index}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.02, duration: 0.28, ease: stepEase }}
-              className={shellClass}
+              transition={{
+                layout: { duration: 0.32, ease: stepEase },
+                delay: index * 0.02,
+                duration: 0.28,
+                ease: stepEase,
+              }}
+              className={cn(shellClass, "relative")}
               aria-current={isCurrent ? "step" : undefined}
             >
-              <div className="flex items-start gap-3 sm:gap-4">
+              {isCurrent ? (
+                <motion.div
+                  layoutId="chef-active-step-shell"
+                  className="pointer-events-none absolute inset-0 rounded-xl ring-2 ring-primary/20"
+                  transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                />
+              ) : null}
+              <div className="relative flex items-start gap-3 sm:gap-4">
                 <span className={badgeClass} aria-hidden>
                   <AnimatePresence initial={false} mode="popLayout">
                     {isCompleted && !isCurrent ? (
@@ -177,23 +195,31 @@ function StepsPanel({
                 </span>
 
                 <div className="min-w-0 flex-1 space-y-3">
-                  <Text
-                    as="p"
-                    variant={
-                      isCurrent
-                        ? immersive
-                          ? "h4"
-                          : "body-medium"
-                        : "body"
-                    }
-                    measure="none"
-                    className={cn(
-                      isCompleted && "text-slate line-through decoration-hairline-strong/80",
-                      isUpcoming && "text-charcoal"
-                    )}
+                  <motion.div
+                    key={step.instruction}
+                    initial={{ opacity: 0.82 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.28, ease: stepEase }}
                   >
-                    {step.instruction}
-                  </Text>
+                    <Text
+                      as="p"
+                      variant={
+                        isCurrent
+                          ? immersive
+                            ? "h4"
+                            : "body-medium"
+                          : "body"
+                      }
+                      measure="none"
+                      className={cn(
+                        isCompleted &&
+                          "text-slate line-through decoration-hairline-strong/80",
+                        isUpcoming && "text-charcoal"
+                      )}
+                    >
+                      {step.instruction}
+                    </Text>
+                  </motion.div>
 
                   <div className="flex flex-wrap gap-2">
                     {step.duration_minutes ? (

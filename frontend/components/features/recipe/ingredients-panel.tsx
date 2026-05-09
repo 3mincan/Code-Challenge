@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { Check, RefreshCw, Replace } from "lucide-react"
 
 import { Text } from "@/components/ui/typography"
+import { cn } from "@/lib/utils"
 import type { Ingredient } from "@/types/recipe"
 
 import {
@@ -11,6 +12,7 @@ import {
   didIngredientSubstitute,
   formatIngredientAmount,
   formatQuantity,
+  getIngredientSignature,
 } from "./recipe-utils"
 
 type IngredientsPanelProps = {
@@ -19,6 +21,8 @@ type IngredientsPanelProps = {
   onToggleIngredient: (ingredientName: string) => void
   originalIngredients?: Ingredient[]
   scaledServings: number | null
+  /** Agent run in flight — subtle emphasis that recipe data may update. */
+  agentBusy?: boolean
 }
 
 function IngredientsPanel({
@@ -27,6 +31,7 @@ function IngredientsPanel({
   onToggleIngredient,
   originalIngredients = [],
   scaledServings,
+  agentBusy = false,
 }: IngredientsPanelProps) {
   const checked = new Set(checkedIngredients.map((item) => item.toLowerCase()))
   const completion = ingredients.length
@@ -35,10 +40,15 @@ function IngredientsPanel({
 
   return (
     <motion.section
+      layout
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.08, duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
-      className="rounded-xl border border-hairline bg-canvas p-5 shadow-elevation-1 sm:p-6"
+      className={cn(
+        "rounded-xl border border-hairline bg-canvas p-5 shadow-elevation-1 sm:p-6",
+        "transition-[box-shadow,ring] duration-300",
+        agentBusy && "shadow-elevation-2 ring-1 ring-primary/20"
+      )}
     >
       <div className="mb-6 space-y-4">
         <div className="flex items-end justify-between gap-4">
@@ -71,11 +81,20 @@ function IngredientsPanel({
           </Text>
         </div>
 
-        {scaledServings ? (
-          <div className="rounded-lg bg-tint-sky p-3 text-body-sm-medium text-ink">
-            Quantities updated for {scaledServings} servings.
-          </div>
-        ) : null}
+        <AnimatePresence initial={false} mode="popLayout">
+          {scaledServings ? (
+            <motion.div
+              key={scaledServings}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="rounded-lg bg-tint-sky p-3 text-body-sm-medium text-ink"
+            >
+              Quantities updated for {scaledServings} servings.
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </div>
 
       <motion.ul layout className="space-y-3">
@@ -87,11 +106,9 @@ function IngredientsPanel({
 
           return (
             <motion.li
-              layout
-              key={`${ingredient.name}-${ingredient.unit ?? ""}-${index}`}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.025, duration: 0.24 }}
+              layout="position"
+              transition={{ layout: { duration: 0.32, ease: [0.16, 1, 0.3, 1] } }}
+              key={`ingredient-row-${index}`}
             >
               <button
                 type="button"
@@ -125,7 +142,11 @@ function IngredientsPanel({
                 </span>
 
                 <span className="min-w-0 flex-1">
-                  <span
+                  <motion.span
+                    key={getIngredientSignature(ingredient)}
+                    initial={{ opacity: 0.72 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                     className={
                       isChecked
                         ? "block text-body-md-medium text-ink line-through decoration-brand-green/60"
@@ -133,21 +154,37 @@ function IngredientsPanel({
                     }
                   >
                     {formatQuantity(ingredient)}
-                  </span>
+                  </motion.span>
                   <span className="mt-1 flex flex-wrap items-center gap-2 text-body-sm text-slate">
                     <span className="capitalize">{ingredient.category}</span>
-                    {isScaled && original ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-tint-sky px-2 py-0.5 text-body-sm-medium text-ink">
-                        <RefreshCw className="size-3.5" />
-                        was {formatIngredientAmount(original)}
-                      </span>
-                    ) : null}
-                    {isSubstitution && original ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-tint-lavender px-2 py-0.5 text-body-sm-medium text-brand-purple-800">
-                        <Replace className="size-3.5" />
-                        replaces {original.name}
-                      </span>
-                    ) : null}
+                    <AnimatePresence initial={false}>
+                      {isScaled && original ? (
+                        <motion.span
+                          key={`scale-${index}`}
+                          initial={{ opacity: 0, scale: 0.92, x: -6 }}
+                          animate={{ opacity: 1, scale: 1, x: 0 }}
+                          exit={{ opacity: 0, scale: 0.96 }}
+                          transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+                          className="inline-flex items-center gap-1 rounded-full bg-tint-sky px-2 py-0.5 text-body-sm-medium text-ink"
+                        >
+                          <RefreshCw className="size-3.5" />
+                          was {formatIngredientAmount(original)}
+                        </motion.span>
+                      ) : null}
+                      {isSubstitution && original ? (
+                        <motion.span
+                          key={`sub-${index}`}
+                          initial={{ opacity: 0, scale: 0.92, x: -6 }}
+                          animate={{ opacity: 1, scale: 1, x: 0 }}
+                          exit={{ opacity: 0, scale: 0.96 }}
+                          transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
+                          className="inline-flex items-center gap-1 rounded-full bg-tint-lavender px-2 py-0.5 text-body-sm-medium text-brand-purple-800"
+                        >
+                          <Replace className="size-3.5" />
+                          replaces {original.name}
+                        </motion.span>
+                      ) : null}
+                    </AnimatePresence>
                   </span>
                 </span>
               </button>

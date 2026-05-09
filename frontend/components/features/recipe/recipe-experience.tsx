@@ -55,6 +55,7 @@ function RecipeExperience({
           originalState?.recipe?.ingredients ?? recipe.ingredients
         }
         scaledServings={state.scaled_servings}
+        agentBusy={running}
       />
     </div>
   )
@@ -124,6 +125,7 @@ function RecipeExperience({
                     currentStepIndex={currentStepIndex}
                     steps={recipe.steps}
                     immersive
+                    agentBusy={running}
                   />
                 </motion.div>
 
@@ -157,6 +159,7 @@ function RecipeExperience({
                   <StepsPanel
                     currentStepIndex={currentStepIndex}
                     steps={recipe.steps}
+                    agentBusy={running}
                   />
                 </motion.div>
               </div>

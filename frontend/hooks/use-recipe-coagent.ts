@@ -15,6 +15,12 @@ import type { RecipeContext } from "@/types/recipe"
 
 type RecipeCoAgentStatus = "hydrating" | "missing-session" | "ready"
 
+/**
+ * Single source of truth: `useCoAgent` state matches the backend RecipeContext
+ * (via AG-UI). Local `setState` is used only for pure-UI fields (e.g. checked
+ * ingredients) or forwarding CopilotKit merges — recipe rows, servings, steps,
+ * and progress always reflect `coagent.state`.
+ */
 function useRecipeCoAgent() {
   const [hydrated, setHydrated] = useState(false)
   const [originalState, setOriginalState] = useState<RecipeContext | null>(null)

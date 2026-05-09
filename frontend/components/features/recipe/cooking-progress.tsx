@@ -46,14 +46,21 @@ function CookingProgress({ state, compact = false }: CookingProgressProps) {
           />
         </div>
         {currentStep ? (
-          <Text
-            variant="small"
-            tone="muted"
-            measure="none"
-            className="line-clamp-2"
+          <motion.div
+            key={`${currentStepIndex}-${currentStep.instruction.slice(0, 40)}`}
+            initial={{ opacity: 0.72, y: 3 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           >
-            {currentStep.instruction}
-          </Text>
+            <Text
+              variant="small"
+              tone="muted"
+              measure="none"
+              className="line-clamp-2"
+            >
+              {currentStep.instruction}
+            </Text>
+          </motion.div>
         ) : null}
       </div>
     )
@@ -71,9 +78,16 @@ function CookingProgress({ state, compact = false }: CookingProgressProps) {
           <Text variant="caption" tone="inverse-muted" measure="none">
             Cooking progress
           </Text>
-          <Text as="h2" variant="h4" tone="inverse" measure="none">
-            {state.cooking_started ? "In progress" : "Ready when you are"}
-          </Text>
+          <motion.div
+            key={state.cooking_started ? "cooking" : "idle"}
+            initial={{ opacity: 0.88, y: 3 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <Text as="h2" variant="h4" tone="inverse" measure="none">
+              {state.cooking_started ? "In progress" : "Ready when you are"}
+            </Text>
+          </motion.div>
         </div>
         <span className="rounded-full bg-on-dark px-3 py-1 text-body-sm-medium text-ink">
           {progress}%
@@ -83,13 +97,19 @@ function CookingProgress({ state, compact = false }: CookingProgressProps) {
       <div className="mb-5 h-2 overflow-hidden rounded-full bg-on-dark/20">
         <motion.div
           className="h-full rounded-full bg-tint-yellow-bold"
-          initial={{ width: 0 }}
+          initial={false}
           animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         />
       </div>
 
-      <div className="rounded-lg bg-on-dark/10 p-4">
+      <motion.div
+        key={currentStepIndex}
+        initial={{ opacity: 0.92 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+        className="rounded-lg bg-on-dark/10 p-4"
+      >
         <Text variant="caption" tone="inverse-muted" measure="none">
           Current step
         </Text>
@@ -102,16 +122,19 @@ function CookingProgress({ state, compact = false }: CookingProgressProps) {
           Step {currentStepIndex + 1} of {recipe.steps.length}
         </Text>
         {currentStep ? (
-          <Text
+          <motion.div
+            key={currentStep.instruction.slice(0, 48)}
+            initial={{ opacity: 0.75, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
             className="mt-2"
-            variant="small"
-            tone="inverse-muted"
-            measure="none"
           >
-            {currentStep.instruction}
-          </Text>
+            <Text variant="small" tone="inverse-muted" measure="none">
+              {currentStep.instruction}
+            </Text>
+          </motion.div>
         ) : null}
-      </div>
+      </motion.div>
     </motion.aside>
   )
 }

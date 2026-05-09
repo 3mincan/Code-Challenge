@@ -51,9 +51,20 @@ function RecipeHeader({ recipe, running }: RecipeHeaderProps) {
           <Text variant="caption" measure="none">
             Servings
           </Text>
-          <Text variant="h4" measure="none">
-            {recipe.servings}
-          </Text>
+          <motion.div
+            key={recipe.servings}
+            initial={{ scale: 0.94, opacity: 0.82 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{
+              type: "spring",
+              stiffness: 440,
+              damping: 28,
+            }}
+          >
+            <Text variant="h4" measure="none">
+              {recipe.servings}
+            </Text>
+          </motion.div>
         </div>
         <div className="rounded-lg bg-tint-sky p-4">
           <Clock className="mb-4 size-5 text-link-blue" />

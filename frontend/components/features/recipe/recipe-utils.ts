@@ -93,6 +93,34 @@ function getProgressPercent(state: RecipeContext) {
   return Math.round(((getCurrentStepIndex(state) + 1) / stepCount) * 100)
 }
 
+/**
+ * Fingerprint of agent-owned recipe fields + progress flags. When this
+ * changes, shared UI can animate diff affordances. Always derive from
+ * RecipeContext / Recipe — never from chat text.
+ */
+function getRecipeContextReactiveKey(state: RecipeContext): string {
+  const recipe = state.recipe
+
+  if (!recipe) {
+    return ""
+  }
+
+  const ingredients = recipe.ingredients.map(getIngredientSignature).join(";")
+  const steps = recipe.steps
+    .map((step) => `${step.step_number}:${step.instruction}`)
+    .join(";")
+
+  return [
+    state.current_step,
+    state.cooking_started ? "1" : "0",
+    state.scaled_servings ?? "",
+    recipe.servings,
+    recipe.original_servings ?? "",
+    ingredients,
+    steps,
+  ].join("|")
+}
+
 export {
   didIngredientScale,
   didIngredientSubstitute,
@@ -100,6 +128,8 @@ export {
   formatMinutes,
   formatQuantity,
   getCurrentStepIndex,
+  getIngredientSignature,
   getProgressPercent,
+  getRecipeContextReactiveKey,
   getTotalTime,
 }
