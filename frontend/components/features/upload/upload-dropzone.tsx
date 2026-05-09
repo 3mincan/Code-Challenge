@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion"
 import { FileText, Upload, X } from "lucide-react"
-import { useRef, useState, type DragEvent } from "react"
+import { useId, useRef, useState, type DragEvent } from "react"
 
 import { Button } from "@/components/ui/button"
 import { TactileButton } from "@/components/ui/tactile-button"
@@ -39,6 +39,7 @@ function UploadDropzone({
   onUpload,
 }: UploadDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null)
+  const hintId = useId()
   const [isDragging, setIsDragging] = useState(false)
 
   const openPicker = () => {
@@ -62,6 +63,7 @@ function UploadDropzone({
         role="button"
         tabIndex={0}
         aria-label="Upload recipe file"
+        aria-describedby={hintId}
         onClick={openPicker}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
@@ -111,7 +113,7 @@ function UploadDropzone({
             <Text as="h2" variant="h2" measure="lg">
               Drop in a recipe, or tap to choose one.
             </Text>
-            <Text measure="lg">
+            <Text measure="lg" id={hintId}>
               Upload a PDF or plain text recipe. The companion will read it,
               structure the ingredients and steps, then prepare your cooking
               workspace.

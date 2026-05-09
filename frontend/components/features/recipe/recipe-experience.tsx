@@ -83,9 +83,11 @@ function RecipeExperience({
                 <motion.div
                   key="cooking"
                   {...panelCrossfade}
-                  className="mx-auto max-w-2xl space-y-5 pb-16 pt-2 sm:pb-20"
+                  className="mx-auto max-w-2xl space-y-5 pb-[max(5rem,env(safe-area-inset-bottom,0px)+2.5rem)] pt-2 sm:space-y-6 sm:pb-[max(5.5rem,env(safe-area-inset-bottom,0px)+2.5rem)]"
                 >
                 <div
+                  role="region"
+                  aria-label="Cooking mode controls"
                   className={cn(
                     "sticky top-0 z-30 -mx-4 space-y-3 sm:-mx-6"
                   )}
@@ -104,7 +106,7 @@ function RecipeExperience({
                           type="button"
                           variant="outline"
                           size="icon"
-                          className="size-12 shrink-0 touch-manipulation rounded-xl sm:size-11"
+                          className="size-12 shrink-0 touch-manipulation rounded-xl"
                           aria-label="Previous step"
                           disabled={currentStepIndex <= 0}
                           onClick={() => onGoToStep(currentStepIndex - 1)}
@@ -129,7 +131,7 @@ function RecipeExperience({
                           type="button"
                           variant="outline"
                           size="icon"
-                          className="size-12 shrink-0 touch-manipulation rounded-xl sm:size-11"
+                          className="size-12 shrink-0 touch-manipulation rounded-xl"
                           aria-label="Next step"
                           disabled={
                             currentStepIndex >= recipe.steps.length - 1
@@ -145,11 +147,11 @@ function RecipeExperience({
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-center gap-2 px-1">
+                  <div className="flex flex-wrap items-center justify-center gap-2 px-1 sm:gap-3">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="touch-manipulation"
+                      className="min-h-12 touch-manipulation sm:min-h-11"
                       onClick={() => {
                         setCookingMode(false)
                       }}
@@ -159,7 +161,7 @@ function RecipeExperience({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="touch-manipulation text-slate"
+                      className="min-h-12 touch-manipulation text-slate sm:min-h-11"
                       onClick={clearRecipeSession}
                     >
                       <RotateCcw data-icon="inline-start" />
@@ -181,10 +183,11 @@ function RecipeExperience({
                     "motion-standard rounded-2xl border border-hairline/80 bg-surface-soft/70 shadow-elevation-1",
                     "open:bg-canvas open:shadow-elevation-2",
                     "transition-[opacity,background-color,box-shadow] duration-300",
-                    "opacity-[0.88] open:opacity-100"
+                    "opacity-[0.88] open:opacity-100",
+                    "focus-within:ring-2 focus-within:ring-ring/30"
                   )}
                 >
-                  <summary className="cursor-pointer list-none px-5 py-4 text-body-md-medium text-ink outline-none marker:content-none [&::-webkit-details-marker]:hidden">
+                  <summary className="min-h-12 cursor-pointer list-none px-5 py-4 text-body-md-medium text-ink outline-none marker:content-none [&::-webkit-details-marker]:hidden">
                     <span className="flex items-center justify-between gap-3">
                       Recipe and ingredients
                       <span className="text-body-sm font-normal text-slate">

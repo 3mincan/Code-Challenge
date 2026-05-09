@@ -100,7 +100,7 @@ function StepsPanel({
             </Text>
           </div>
           <div
-            className="flex gap-1"
+            className="flex gap-1.5 sm:gap-2"
             role="list"
             aria-label="Progress by step"
           >
@@ -115,20 +115,23 @@ function StepsPanel({
                   layout
                   type="button"
                   role="listitem"
-                  title={
-                    jumpable ? `Go to step ${step.step_number}` : undefined
+                  aria-label={
+                    jumpable
+                      ? `Step ${step.step_number}${
+                          current ? ", current" : done ? ", completed" : ""
+                        }`
+                      : `Step ${step.step_number} indicator`
                   }
+                  aria-current={current ? "step" : undefined}
                   disabled={!jumpable}
                   onClick={
                     jumpable ? () => onStepChange?.(index) : undefined
                   }
                   className={cn(
-                    "h-2 min-h-8 min-w-6 flex-1 rounded-full transition-colors",
+                    "group relative flex min-h-12 min-w-8 flex-1 touch-manipulation items-center justify-center rounded-full sm:min-h-11",
                     !jumpable && "pointer-events-none",
-                    jumpable && "cursor-pointer touch-manipulation",
-                    done && "bg-brand-green",
-                    current && !done && "bg-primary",
-                    !done && !current && "bg-hairline-soft"
+                    jumpable && "cursor-pointer",
+                    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
                   )}
                   initial={false}
                   animate={{
@@ -136,7 +139,17 @@ function StepsPanel({
                     opacity: current ? 1 : done ? 0.92 : 0.65,
                   }}
                   transition={{ duration: 0.35, ease: motionEasings.emphasized }}
-                />
+                >
+                  <span
+                    className={cn(
+                      "pointer-events-none h-2.5 w-full max-h-2.5 rounded-full transition-colors",
+                      done && "bg-brand-green",
+                      current && !done && "bg-primary",
+                      !done && !current && "bg-hairline-soft"
+                    )}
+                    aria-hidden
+                  />
+                </motion.button>
               )
             })}
           </div>
@@ -166,7 +179,7 @@ function StepsPanel({
             immersive &&
               onStepChange &&
               !isCurrent &&
-              "hover:border-hairline-strong hover:bg-surface-soft/90"
+              "hover:border-hairline-strong hover:bg-surface-soft/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
           )
 
           const badgeClass = cn(
@@ -207,6 +220,25 @@ function StepsPanel({
               }}
               className={cn(shellClass, "relative")}
               aria-current={isCurrent ? "step" : undefined}
+              aria-label={
+                immersive && onStepChange && !isCurrent
+                  ? `Go to step ${step.step_number}`
+                  : undefined
+              }
+              tabIndex={
+                immersive && onStepChange && !isCurrent ? 0 : undefined
+              }
+              onKeyDown={
+                immersive && onStepChange && !isCurrent
+                  ? (e) => {
+                      if (e.key !== "Enter" && e.key !== " ") {
+                        return
+                      }
+                      e.preventDefault()
+                      onStepChange(index)
+                    }
+                  : undefined
+              }
               onClick={
                 immersive && onStepChange && !isCurrent
                   ? () => onStepChange(index)

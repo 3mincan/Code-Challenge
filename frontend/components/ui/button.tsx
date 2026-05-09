@@ -28,15 +28,15 @@ const buttonVariants = cva(
       },
       size: {
         default:
-          "min-h-10 gap-1.5 px-4 py-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3",
-        xs: "min-h-8 gap-1 rounded-sm px-2.5 py-1.5 text-caption-bold in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-3",
-        sm: "min-h-9 gap-1.5 px-3 py-2 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5",
-        lg: "min-h-11 gap-2 px-5 py-3 has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4",
-        icon: "size-11",
+          "min-h-12 gap-1.5 px-5 py-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3 md:min-h-11",
+        xs: "min-h-10 gap-1 rounded-sm px-3 py-2 text-caption-bold in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-3",
+        sm: "min-h-12 gap-1.5 px-4 py-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5 md:min-h-11",
+        lg: "min-h-12 gap-2 px-5 py-3.5 has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4",
+        icon: "size-12 md:size-11",
         "icon-xs":
-          "size-8 rounded-sm in-data-[slot=button-group]:rounded-md [&_svg:not([class*='size-'])]:size-3",
-        "icon-sm": "size-10 rounded-md in-data-[slot=button-group]:rounded-md",
-        "icon-lg": "size-11",
+          "size-10 rounded-sm in-data-[slot=button-group]:rounded-md [&_svg:not([class*='size-'])]:size-3 md:size-9",
+        "icon-sm": "size-12 rounded-md in-data-[slot=button-group]:rounded-md md:size-10",
+        "icon-lg": "size-12 md:size-11",
       },
     },
     defaultVariants: {

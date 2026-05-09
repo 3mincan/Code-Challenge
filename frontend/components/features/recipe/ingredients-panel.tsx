@@ -46,6 +46,7 @@ function IngredientsPanel({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.08, duration: 0.36, ease: motionEasings.emphasized }}
+      aria-labelledby="ingredients-heading"
       className={cn(
         "rounded-xl border border-hairline bg-canvas p-5 shadow-elevation-1 sm:p-6",
         "transition-[box-shadow,ring] duration-300",
@@ -58,7 +59,7 @@ function IngredientsPanel({
             <Text variant="caption" measure="none">
               Mise en place
             </Text>
-            <Text as="h2" variant="h3" measure="none">
+            <Text as="h2" variant="h3" measure="none" id="ingredients-heading">
               Ingredients
             </Text>
           </div>
@@ -120,8 +121,8 @@ function IngredientsPanel({
                 {...tactilePointer}
                 className={
                   isChecked
-                    ? "motion-standard flex min-h-16 w-full items-start gap-3 rounded-lg border border-brand-green bg-tint-mint p-3 text-left shadow-elevation-1"
-                    : "motion-standard flex min-h-16 w-full items-start gap-3 rounded-lg border border-transparent bg-surface-soft p-3 text-left hover:border-hairline-strong hover:bg-canvas"
+                    ? "motion-standard flex min-h-16 w-full items-start gap-3 rounded-lg border border-brand-green bg-tint-mint p-3 text-left shadow-elevation-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
+                    : "motion-standard flex min-h-16 w-full items-start gap-3 rounded-lg border border-transparent bg-surface-soft p-3 text-left hover:border-hairline-strong hover:bg-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
                 }
               >
                 <span

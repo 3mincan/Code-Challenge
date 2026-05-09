@@ -32,6 +32,9 @@ function RecipeHome() {
               <Surface
                 variant="base"
                 className="mx-auto max-w-2xl space-y-4 p-8"
+                aria-busy="true"
+                aria-live="polite"
+                aria-label="Loading recipe workspace"
               >
                 <Text variant="caption" measure="none">
                   Preparing kitchen

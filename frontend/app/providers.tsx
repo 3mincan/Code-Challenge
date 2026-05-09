@@ -7,6 +7,7 @@ import { useEffect, useState, type ReactNode } from "react"
 
 import { COPILOT_RUNTIME_URL, RECIPE_AGENT_NAME } from "@/config/copilot"
 import { createQueryClient } from "@/lib/query/client"
+import { SkipLink } from "@/components/ui/skip-link"
 import {
   readRecipeSession,
   subscribeToRecipeSession,
@@ -36,6 +37,7 @@ function Providers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <SkipLink />
       <MotionConfig reducedMotion="user">
         <CopilotKit
           agent={RECIPE_AGENT_NAME}

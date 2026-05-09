@@ -24,7 +24,12 @@ function ShellMain({
   className?: string
 }) {
   return (
-    <main className={cn("flex-1", className)} data-slot="shell-main">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className={cn("flex-1 outline-none", className)}
+      data-slot="shell-main"
+    >
       {children}
     </main>
   )

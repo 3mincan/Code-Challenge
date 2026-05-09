@@ -174,7 +174,7 @@
 
   --container-max: 80rem;
   --container-gutter: clamp(1rem, 4vw, 2rem);
-  --touch-target: 2.75rem;
+  --touch-target: 3rem;
 
   --elevation-1: 0 1px 2px 0 rgb(15 15 15 / 4%);
   --elevation-2: 0 4px 12px 0 rgb(15 15 15 / 8%);
@@ -312,30 +312,48 @@
 
 @utility text-body-md {
   font-size: 1rem;
-  line-height: 1.55;
+  line-height: 1.62;
   font-weight: 400;
   letter-spacing: 0;
+
+  @media (min-width: 48rem) {
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
 }
 
 @utility text-body-md-medium {
   font-size: 1rem;
-  line-height: 1.55;
+  line-height: 1.62;
   font-weight: 500;
   letter-spacing: 0;
+
+  @media (min-width: 48rem) {
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
 }
 
 @utility text-body-sm {
   font-size: 0.875rem;
-  line-height: 1.5;
+  line-height: 1.58;
   font-weight: 400;
   letter-spacing: 0;
+
+  @media (min-width: 48rem) {
+    font-size: 0.9375rem;
+  }
 }
 
 @utility text-body-sm-medium {
   font-size: 0.875rem;
-  line-height: 1.5;
+  line-height: 1.58;
   font-weight: 500;
   letter-spacing: 0;
+
+  @media (min-width: 48rem) {
+    font-size: 0.9375rem;
+  }
 }
 
 @utility text-caption-bold {
@@ -395,6 +413,21 @@
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 3px;
+  }
+
+  @media (prefers-contrast: more) {
+    :root {
+      --hairline-strong: oklch(0.58 0.02 79);
+      --slate: oklch(0.32 0.016 78);
+      --stone: oklch(0.48 0.014 80);
+      --charcoal: oklch(0.22 0.014 72);
+      --ring: oklch(0.38 0.16 298);
+    }
+
+    .dark {
+      --hairline-strong: oklch(0.88 0.02 85);
+      --ring: oklch(0.82 0.12 300);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
