@@ -1,117 +1,74 @@
 # Recipe Companion Frontend
 
-Frontend for the Recipe Companion coding challenge. The app uses Next.js App
-Router and talks to the completed FastAPI backend in `../backend`.
+Next.js (App Router) client for the Recipe Companion challenge. The canonical **submission guide**, one-command startup, environment matrix, architecture overview, and checklist live in the **[repository root README](../README.md)**.
+
+## Requirements
+
+- Node.js **20.19+**
+- npm
+- Backend reachable at the URL in `.env.local` (default `http://localhost:8000`)
 
 ## Setup
 
-Requirements:
-
-- Node.js 20.19 or newer
-- npm
-- Backend running on `http://localhost:8000`
-
-Install dependencies:
-
 ```bash
 npm install
-```
-
-Create local environment:
-
-```bash
-cp .env.example .env.local
-```
-
-Run the development server:
-
-```bash
+cp .env.example .env.local   # optional
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open http://localhost:3000. From the monorepo root you can use **`./scripts/dev.sh`** to bring up Docker backend (if `.env` is present) and this dev server.
 
 ## Scripts
 
-```bash
-npm run dev           # start Next.js locally
-npm run build         # production build
-npm run start         # serve a production build
-npm run lint          # ESLint
-npm run typecheck     # TypeScript without emitting files
-npm run format        # Prettier write
-npm run format:check  # Prettier check
-```
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | Next.js development server |
+| `npm run build` | Production build |
+| `npm run start` | Serve production build |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run format` | Prettier write |
+| `npm run format:check` | Prettier check |
 
 ## Environment
 
-```bash
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
-```
+`NEXT_PUBLIC_API_BASE_URL` — absolute API base (no trailing slash required). Read in `config/env.ts`. The Next route `app/api/copilotkit/route.ts` proxies the CopilotKit runtime to `{apiBaseUrl}/copilotkit`.
 
-The value must be an absolute URL. It is read by `config/env.ts` and defaults to
-`http://localhost:8000` for local development.
-
-## Architecture
-
-The structure is intentionally small and flat while the product is still early:
+## Source layout (high level)
 
 ```text
 app/
-  globals.css          # Tailwind v4 entrypoint and design tokens
-  layout.tsx           # root layout, fonts, metadata, providers
-  page.tsx             # current foundation specimen
-  providers.tsx        # client providers such as React Query
+  globals.css       # Design tokens, Tailwind v4, typography utilities
+  layout.tsx        # Fonts, metadata, Providers
+  page.tsx          # RecipeHome entry
+  providers.tsx     # React Query, MotionConfig, CopilotKit
+  api/copilotkit/   # CopilotKit → HttpAgent → backend AG-UI
 components/
-  layout/              # app-level layout shell primitives
-  ui/                  # reusable design-system primitives
+  layout/           # App shell
+  features/         # upload/*, recipe/* (tablet workspace)
+  feedback/         # Connection / session messaging
+  ui/               # Primitives: button, surface, panel, typography, motion
 config/
-  env.ts               # typed environment access
+  copilot.ts        # Agent name (matches backend)
+  env.ts
+hooks/
+  use-recipe-coagent.ts   # useCoAgent + session hydrate/persist (debounced)
+  use-recipe-upload.ts
+  use-voice-transcription.ts
 lib/
-  api/                 # API client utilities
-  query/               # React Query client setup
-  recipe-context.ts    # default RecipeContext shape
-  recipe-session.ts    # session persistence for thread/state hydration
-  utils.ts             # shared className helper
+  api/client.ts, recipe-session.ts, recipe-context.ts, …
 types/
-  api.ts               # shared API utility types
-  recipe.ts            # backend RecipeContext and upload response types
+  recipe.ts, api.ts
 ```
 
-Key decisions:
+## Principles
 
-- App Router stays at the top level to match Next.js conventions.
-- `components/ui` holds reusable primitives from the design system.
-- `components/layout` holds shell components that compose pages without carrying
-  domain behaviour.
-- `config/env.ts` centralises environment reads and validation.
-- `lib/api/client.ts` provides a small typed fetch wrapper without baking in
-  recipe-specific business logic.
-- `lib/query/client.ts` keeps React Query defaults in one place.
-- `app/api/copilotkit/route.ts` bridges CopilotKit to the backend AG-UI endpoint
-  with an `HttpAgent` named `recipe_agent`.
-- `hooks/use-recipe-coagent.ts` hydrates `RecipeContext` from the upload response
-  and then reacts to CopilotKit shared state updates. UI should read this state,
-  not assistant message text.
-- `components/features/recipe` contains the tablet-first cooking workspace:
-  recipe header, metadata, ingredients, steps, and progress all render from
-  `RecipeContext`.
-- Ingredient checklist state is stored in `checked_ingredients`; scaled
-  quantities and substitutions are visualised by comparing live state with the
-  original uploaded recipe snapshot.
-- Absolute imports use `@/*` with `baseUrl` configured in `tsconfig.json`.
+- **UI follows `RecipeContext`**, not assistant markdown — agent tools own servings, ingredients, and step index.
+- **Tablet-first**: touch targets, landscape-oriented grids, calm motion (`components/ui/motion.ts` + CSS variables).
+- **`Panel` / `Surface`** — Raised vs flat surfaces share radii and elevation tokens to avoid ad-hoc Tailwind clutter.
+- **Code splitting** — `recipe-experience` loads dynamically after a recipe exists (`recipe-home.tsx`) to keep the upload path light.
 
-## Created Foundation Files
+## Further reading
 
-- `.env.example`
-- `.prettierignore`
-- `.prettierrc.json`
-- `app/providers.tsx`
-- `components/layout/app-shell.tsx`
-- `config/env.ts`
-- `lib/api/client.ts`
-- `lib/query/client.ts`
-- `types/api.ts`
-
-Existing files also configure TypeScript, TailwindCSS, shadcn/ui, Framer Motion
-utilities, typography, theme tokens, and the tablet-first layout specimen.
+- [Backend API & state shape](../backend/README.md)
+- [Root README: architecture diagram, tradeoffs, demo tips](../README.md)

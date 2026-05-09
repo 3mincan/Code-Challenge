@@ -1,99 +1,216 @@
-# Recipe Companion Challenge
+# Recipe Companion — Submission
 
-Build a cooking companion. A user drops in a recipe (PDF or text), your app extracts it, shows it beautifully, and lets the user chat with an agent that can scale servings, swap ingredients, and walk them through the steps.
+Cooking companion for the **tablet-in-the-kitchen** brief: upload a recipe, explore a structured workspace, and chat with an agent that scales servings, substitutes ingredients, and updates progress. The **FastAPI + pydantic-ai backend** in `backend/` is challenge-provided; this submission adds the **Next.js frontend** in `frontend/`.
 
-The backend is done. Your job is the frontend.
+---
 
-## Target device: a tablet in the kitchen
+## Product walkthrough
 
-Design for a **tablet**, not a laptop. The cook props it on a worktop, glances at it with wet or messy hands, follows steps while cooking. This shapes most of your UX decisions:
+1. **Upload** — Drop a PDF or plain text recipe. The app shows progress, then a handoff summary (servings, times, ingredient count).
+2. **Browse** — Recipe header, tinted metadata tiles, checklist ingredients (scaled or substituted amounts highlighted against the original upload), and a step list aligned with agent state.
+3. **Cooking mode** — Large step focus, sticky voice + step controls, optional “recipe & ingredients” drawer.
+4. **Ask Chef** — CopilotKit popup wired to the backend AG-UI endpoint; the UI reacts to **`RecipeContext`** from tools, not to parsing chat text.
+5. **Session** — `threadId` and state persist in `sessionStorage` so a refresh keeps the workspace coherent with the agent.
 
-- **Touch-first.** Big, forgiving tap targets. No hover states — assume there is no cursor.
-- **Landscape is primary.** Portrait is fine as a secondary layout; mobile is nice-to-have, not the goal.
-- **Readable at arm's length.** Generous type, strong contrast, plenty of whitespace. Dense desktop-style chrome is wrong here.
-- **One-handed and glanceable.** The cook is holding a spatula. Long paragraphs, deep menus and tiny controls will hurt.
+Design for **~1024×768**, touch-first, landscape-primary; mobile is a graceful fallback.
 
-If you are prototyping in a browser, set the viewport to something like **1024×768** and design against that.
+---
 
-## What you get
+## Quick start (one command)
 
-A working Python backend with:
+From the **repository root** (macOS / Linux / **Git Bash** on Windows):
 
-- `POST /upload` — parses a recipe file into structured data.
-- `POST /copilotkit` — an AG-UI endpoint for the cooking agent (CopilotKit-compatible).
-- Shared state the agent mutates via tools (`scale_recipe`, `substitute_ingredient`, `update_cooking_progress`).
+```bash
+chmod +x scripts/dev.sh   # once, if needed
+./scripts/dev.sh
+```
 
-Endpoints, payloads, state shape and setup: see [backend/README.md](backend/README.md).
+Then open **http://localhost:3000**.
 
-## What to build
+What the script does:
 
-### Must have
+- If **repo-root `.env`** exists and **Docker** is available → `docker compose up -d backend`, waits for `GET /health`, then starts Next.js.
+- If a backend is **already** on port 8000 → skips Docker and starts Next.js.
+- If the backend cannot be started automatically → prints the two manual options below; the dev server still starts so you can fix the API in parallel.
 
-- **File upload** — accept a recipe, show something useful while it parses.
-- **Chat** — wired to CopilotKit, multi-turn, streaming.
-- **Recipe view** — title, time, servings, difficulty, ingredients, steps. Updates live when the agent changes state.
-- **Polish** — transitions, loading states, micro-interactions. Make it feel good to use.
-- **Easy to run** — one README, one command, no hunting.
+---
 
-### Nice to have
+## Manual setup (full control)
 
-- Graceful fallback on phone (the target is tablet, but don't actively break on smaller screens).
-- Voice input — cooking with wet hands is the ideal use case.
-- Real error handling — failed uploads, agent errors, network drops.
+### 1. Backend API keys
 
-## How I'll judge it
-
-- **Does it work?** Golden path and a couple of edge cases.
-- **Is it well designed?** UI and UX decisions you can explain.
-- **Is the code maintainable?** Sensible structure, not clever for its own sake.
-- **Can you explain your choices?** I'll ask about tradeoffs. "I chose X over Y because…" goes a long way.
-- **Did you make it yours?** Personal touches count.
-
-Use AI assistants freely. I care about outcomes, not keystrokes. See [agents.md](agents.md).
-
-## Get started
-
-### 1. Get a Gemini API key
-
-Use Gemini's free tier. Grab a key at https://aistudio.google.com/apikey (sign in, click **Create API key**, copy it).
-
-Create `backend/.env`:
+**Docker** (uses **repo-root** `.env`, same file `docker-compose.yml` references):
 
 ```env
 LLM_MODEL=gemini-2.0-flash
 GEMINI_API_KEY=your_key_here
 ```
 
-Values must not be quoted — `docker-compose` passes them literally.
+Do **not** quote values (`docker-compose` passes them literally).
 
-### 2. Run the backend
+**Local uv** (from `backend/`): create `backend/.env` — see [backend/README.md](backend/README.md).
 
-```bash
-cd backend
-uv sync
-uv run uvicorn src.main:app --reload --port 8000
-```
+Gemini key: [Google AI Studio](https://aistudio.google.com/apikey).
 
-Or with Docker:
+### 2. Backend
 
 ```bash
-docker-compose up backend
+docker compose up backend
 ```
 
-OpenAPI at http://localhost:8000/docs.
+or
 
-For state model, CopilotKit wiring and the agent's tools: [backend/README.md](backend/README.md).
+```bash
+cd backend && uv sync --extra test && uv run uvicorn src.main:app --reload --port 8000
+```
 
-## Tips
+OpenAPI: http://localhost:8000/docs — health: http://localhost:8000/health
 
-- Start with the walking skeleton: upload → chat → show recipe. Then iterate.
-- The agent mutates state through tools — your UI reacts to state changes, don't parse chat messages.
-- Use the `threadId` from `/upload` to keep the session consistent.
-- Don't over-engineer. Working and simple beats clever and half-finished.
-- Commit often. I'll read the git history.
+### 3. Frontend
 
-## Questions
+```bash
+cd frontend
+cp .env.example .env.local   # optional; defaults to http://localhost:8000
+npm install
+npm run dev
+```
 
-If anything is unclear, email me at tolo.palmer@indegene.com. I'd rather answer a question than have you guess.
+App: http://localhost:3000
 
-Good luck.
+---
+
+## Environment reference
+
+| Location | Purpose |
+|----------|---------|
+| **Repo root `.env`** | `docker compose` → backend container (LLM keys). |
+| **`backend/.env`** | Running the backend with **uv** locally. |
+| **`frontend/.env.local`** | `NEXT_PUBLIC_API_BASE_URL` (absolute URL of the API, default `http://localhost:8000`). |
+
+CopilotKit from the browser hits **Next.js** at `/api/copilotkit`, which proxies to **`{NEXT_PUBLIC_API_BASE_URL}/copilotkit`** via `HttpAgent`.
+
+---
+
+## Architecture
+
+```mermaid
+flowchart LR
+  subgraph browser [Browser]
+    UI[Next.js App]
+    CK[CopilotKit client]
+    UI --> CK
+  end
+  subgraph next [Next.js server]
+    Route["/api/copilotkit"]
+  end
+  subgraph api [Backend :8000]
+    Upload["POST /upload"]
+    AGUI["POST /copilotkit"]
+  end
+  UI -->|fetch upload| Upload
+  CK --> Route -->|HttpAgent| AGUI
+  UI -->|RecipeContext| Session[(sessionStorage)]
+```
+
+- **`useRecipeCoAgent`** — Hydrates from session, syncs **`useCoAgent`** (`recipe_agent`) with backend `RecipeContext`; persists debounced snapshots when a recipe exists.
+- **Features** — `components/features/upload` and `components/features/recipe`; **UI primitives** — `components/ui` (tokens, surfaces, typography, motion helpers).
+- **Design tokens** — `frontend/app/globals.css` (OKLCH palette, spacing, elevation, motion).
+
+More detail: [frontend/README.md](frontend/README.md), [backend/README.md](backend/README.md).
+
+---
+
+## UX rationale (major decisions)
+
+| Decision | Reasoning |
+|----------|-----------|
+| **Tablet-first layout** | Matches the brief: arm’s-length reading, large tap targets, minimal reliance on hover. |
+| **State-driven UI** | Ingredient scale/substitute/progress come from **tools → `RecipeContext`**; avoids brittle parsing of assistant text. |
+| **Cooking mode** | Reduces cognitive load during active cooking; sticky controls support one-handed glances. |
+| **Warm, calm visual system** | Kitchen context: paper-like canvas, soft plum accent, restrained motion (incl. `MotionConfig` / reduced-motion). |
+| **Checklist + diff hints** | Checked items and scaled rows give closure; comparing to **original** upload makes agent changes legible. |
+| **Debounced session writes** | Smooth tablet use when the agent updates state frequently. |
+
+---
+
+## Known tradeoffs
+
+- **CopilotKit scope** — Wrapped at app root for a reliable runtime; narrower provider scope would need API compatibility checks.
+- **Dynamic import of recipe workspace** — Improves first load on upload-only path; adds a short loading state when entering the recipe UI after upload.
+- **Voice** — Depends on **Web Speech API** support (browser / permission); graceful degradation when unsupported.
+- **Layout animations** — `framer-motion` `layout` on long lists has a cost on low-end tablets; kept for clarity of active step / ingredient transitions.
+- **Docker vs uv** — Compose file only defines **backend**; frontend is always local Node for hot reload and reviewer familiarity.
+
+---
+
+## Demo & screenshots
+
+**Suggested capture flow (for reviewers or portfolio):**
+
+1. Browser device toolbar: **1024×768** (or real tablet).
+2. Screenshot: upload dropzone + optional file strip.
+3. Screenshot: post-upload handoff (stats tiles + CTA).
+4. Screenshot: browse mode — ingredients + steps.
+5. Screenshot: cooking mode + expanded “Recipe and ingredients”.
+6. Short clip: ask the agent to scale servings or substitute an ingredient → watch the list update without trusting chat text.
+
+Sample data: see `data/` at repo root (PDF/recipe samples) if your clone includes them.
+
+---
+
+## Repository layout
+
+```text
+Code-Challenge/
+├── README.md                 # This submission guide
+├── docker-compose.yml        # Backend service
+├── scripts/dev.sh            # One-shot local dev entrypoint
+├── backend/                  # Challenge backend (FastAPI, AG-UI)
+├── data/                     # Sample recipes (if present)
+└── frontend/
+    ├── README.md             # Frontend-focused developer notes
+    ├── app/                  # Next.js App Router, CopilotKit route
+    ├── components/           # features/, layout/, ui/
+    ├── hooks/                # Co-agent, upload, voice
+    ├── lib/                  # API client, session, recipe context
+    └── config/               # env, Copilot agent name
+```
+
+---
+
+## Submission checklist
+
+- [ ] Repo-root **`.env`** (Docker) or **`backend/.env`** (uv) with a valid **`LLM_MODEL`** and provider key — **unquoted** values.
+- [ ] **`./scripts/dev.sh`** or manual backend + **`cd frontend && npm install && npm run dev`**.
+- [ ] **http://localhost:8000/health** returns healthy before exercising upload/chat.
+- [ ] **`frontend/.env.local`** points at the API if not using default `http://localhost:8000`.
+- [ ] Golden path: upload → recipe view → chat scale/substitute → UI updates from state.
+- [ ] **`npm run lint`** and **`npm run typecheck`** in `frontend/` pass.
+- [ ] Git history reflects incremental, readable commits (reviewers often skim log).
+
+Quality scripts in `frontend/`: `lint`, `typecheck`, `build`, `format:check`.
+
+---
+
+## Quality of life (frontend)
+
+```bash
+cd frontend
+npm run lint          # ESLint
+npm run typecheck     # TypeScript
+npm run build         # Production build
+```
+
+---
+
+## Challenge contact
+
+If the original brief is ambiguous: **tolo.palmer@indegene.com** (as in the source challenge text).
+
+AI-assisted development is explicitly allowed; outcomes and explainability matter more than keystrokes. Tooling notes for assistants: [agents.md](agents.md).
+
+---
+
+## Licence / confidentiality
+
+Treat this repository per your agreement with the challenge organiser. The backend is provided for evaluation; the frontend is candidate work.
