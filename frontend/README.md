@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Recipe Companion Frontend
 
-## Getting Started
+Frontend for the Recipe Companion coding challenge. The app uses Next.js App
+Router and talks to the completed FastAPI backend in `../backend`.
 
-First, run the development server:
+## Setup
+
+Requirements:
+
+- Node.js 20.19 or newer
+- npm
+- Backend running on `http://localhost:8000`
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create local environment:
+
+```bash
+cp .env.example .env.local
+```
+
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev           # start Next.js locally
+npm run build         # production build
+npm run start         # serve a production build
+npm run lint          # ESLint
+npm run typecheck     # TypeScript without emitting files
+npm run format        # Prettier write
+npm run format:check  # Prettier check
+```
 
-## Learn More
+## Environment
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The value must be an absolute URL. It is read by `config/env.ts` and defaults to
+`http://localhost:8000` for local development.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Architecture
 
-## Deploy on Vercel
+The structure is intentionally small and flat while the product is still early:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```text
+app/
+  globals.css          # Tailwind v4 entrypoint and design tokens
+  layout.tsx           # root layout, fonts, metadata, providers
+  page.tsx             # current foundation specimen
+  providers.tsx        # client providers such as React Query
+components/
+  layout/              # app-level layout shell primitives
+  ui/                  # reusable design-system primitives
+config/
+  env.ts               # typed environment access
+lib/
+  api/                 # API client utilities
+  query/               # React Query client setup
+  utils.ts             # shared className helper
+types/
+  api.ts               # shared API utility types
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Key decisions:
+
+- App Router stays at the top level to match Next.js conventions.
+- `components/ui` holds reusable primitives from the design system.
+- `components/layout` holds shell components that compose pages without carrying
+  domain behaviour.
+- `config/env.ts` centralises environment reads and validation.
+- `lib/api/client.ts` provides a small typed fetch wrapper without baking in
+  recipe-specific business logic.
+- `lib/query/client.ts` keeps React Query defaults in one place.
+- Absolute imports use `@/*` with `baseUrl` configured in `tsconfig.json`.
+
+## Created Foundation Files
+
+- `.env.example`
+- `.prettierignore`
+- `.prettierrc.json`
+- `app/providers.tsx`
+- `components/layout/app-shell.tsx`
+- `config/env.ts`
+- `lib/api/client.ts`
+- `lib/query/client.ts`
+- `types/api.ts`
+
+Existing files also configure TypeScript, TailwindCSS, shadcn/ui, Framer Motion
+utilities, typography, theme tokens, and the tablet-first layout specimen.

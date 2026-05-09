@@ -11,8 +11,7 @@ const surfaceVariants = cva("text-card-foreground", {
       agent: "rounded-lg border border-hairline bg-canvas p-6",
       template: "rounded-lg border border-hairline bg-canvas p-5",
       pricing: "rounded-lg border border-hairline bg-canvas p-8",
-      "pricing-featured":
-        "rounded-lg border-2 border-primary bg-surface p-8",
+      "pricing-featured": "rounded-lg border-2 border-primary bg-surface p-8",
       "yellow-bold": "rounded-lg bg-tint-yellow-bold p-8 text-charcoal",
       peach: "rounded-lg bg-tint-peach p-8 text-charcoal",
       rose: "rounded-lg bg-tint-rose p-8 text-charcoal",
@@ -68,8 +67,7 @@ const badgeVariants = cva(
           "rounded-sm bg-tint-lavender px-2 py-0.5 text-brand-purple-800",
         "tag-orange":
           "rounded-sm bg-tint-peach px-2 py-0.5 text-[var(--brand-orange-deep)]",
-        "tag-green":
-          "rounded-sm bg-tint-mint px-2 py-0.5 text-brand-green",
+        "tag-green": "rounded-sm bg-tint-mint px-2 py-0.5 text-brand-green",
       },
     },
     defaultVariants: {

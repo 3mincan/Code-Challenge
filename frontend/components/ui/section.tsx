@@ -40,10 +40,7 @@ function Section({
   )
 }
 
-function Container({
-  className,
-  ...props
-}: ComponentPropsWithoutRef<"div">) {
+function Container({ className, ...props }: ComponentPropsWithoutRef<"div">) {
   return (
     <div
       data-slot="container"
@@ -53,17 +50,11 @@ function Container({
   )
 }
 
-const Stack = ({
-  className,
-  ...props
-}: ComponentPropsWithoutRef<"div">) => (
+const Stack = ({ className, ...props }: ComponentPropsWithoutRef<"div">) => (
   <div className={cn("flex flex-col gap-4", className)} {...props} />
 )
 
-const Cluster = ({
-  className,
-  ...props
-}: ComponentPropsWithoutRef<"div">) => (
+const Cluster = ({ className, ...props }: ComponentPropsWithoutRef<"div">) => (
   <div
     className={cn("flex flex-wrap items-center gap-3", className)}
     {...props}

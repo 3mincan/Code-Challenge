@@ -17,8 +17,7 @@ const buttonVariants = cva(
           "border-hairline-strong bg-transparent text-ink hover:bg-surface aria-expanded:bg-surface aria-expanded:text-ink",
         secondary:
           "border-hairline-strong bg-transparent text-ink hover:bg-surface aria-expanded:bg-surface aria-expanded:text-ink",
-        "on-dark":
-          "bg-on-dark text-ink shadow-elevation-1 hover:bg-on-dark/90",
+        "on-dark": "bg-on-dark text-ink shadow-elevation-1 hover:bg-on-dark/90",
         "secondary-on-dark":
           "border-on-dark-muted bg-transparent text-on-dark hover:bg-on-dark/10 aria-expanded:bg-on-dark/10",
         ghost:
@@ -36,8 +35,7 @@ const buttonVariants = cva(
         icon: "size-11",
         "icon-xs":
           "size-8 rounded-sm in-data-[slot=button-group]:rounded-md [&_svg:not([class*='size-'])]:size-3",
-        "icon-sm":
-          "size-10 rounded-md in-data-[slot=button-group]:rounded-md",
+        "icon-sm": "size-10 rounded-md in-data-[slot=button-group]:rounded-md",
         "icon-lg": "size-11",
       },
     },

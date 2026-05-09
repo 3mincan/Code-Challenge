@@ -10,7 +10,8 @@ const motionEasings = {
 } as const
 
 const motionClasses = {
-  standard: "motion-standard transition-[background-color,border-color,color,box-shadow,transform]",
+  standard:
+    "motion-standard transition-[background-color,border-color,color,box-shadow,transform]",
   emphasized: "motion-emphasized transition-[opacity,transform]",
   tactile: "motion-standard transition-transform active:translate-y-px",
 } as const
