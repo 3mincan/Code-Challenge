@@ -47,6 +47,16 @@ function readRecipeSession(): StoredRecipeSession | null {
   }
 }
 
+function clearRecipeSession() {
+  if (typeof window === "undefined") {
+    return
+  }
+
+  window.sessionStorage.removeItem(THREAD_ID_KEY)
+  window.sessionStorage.removeItem(STATE_KEY)
+  window.dispatchEvent(new Event(SESSION_CHANGED_EVENT))
+}
+
 function subscribeToRecipeSession(listener: () => void) {
   if (typeof window === "undefined") {
     return () => {}
@@ -67,5 +77,10 @@ function subscribeToRecipeSession(listener: () => void) {
   }
 }
 
-export { readRecipeSession, storeRecipeSession, subscribeToRecipeSession }
+export {
+  clearRecipeSession,
+  readRecipeSession,
+  storeRecipeSession,
+  subscribeToRecipeSession,
+}
 export type { StoreRecipeSessionOptions, StoredRecipeSession }

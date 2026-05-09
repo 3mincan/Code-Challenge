@@ -1,5 +1,5 @@
-import { UploadExperience } from "@/components/features/upload/upload-experience"
+import { RecipeHome } from "@/components/features/recipe/recipe-home"
 
 export default function Home() {
-  return <UploadExperience />
+  return <RecipeHome />
 }

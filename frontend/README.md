@@ -93,6 +93,9 @@ Key decisions:
 - `hooks/use-recipe-coagent.ts` hydrates `RecipeContext` from the upload response
   and then reacts to CopilotKit shared state updates. UI should read this state,
   not assistant message text.
+- `components/features/recipe` contains the tablet-first cooking workspace:
+  recipe header, metadata, ingredients, steps, and progress all render from
+  `RecipeContext`.
 - Absolute imports use `@/*` with `baseUrl` configured in `tsconfig.json`.
 
 ## Created Foundation Files
