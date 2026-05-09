@@ -19,6 +19,7 @@ function RecipeHome() {
     state,
     threadId,
     toggleIngredient,
+    goToStep,
   } = useRecipeCoAgent()
 
   if (isHydrating) {
@@ -59,6 +60,7 @@ function RecipeHome() {
             state={state}
             threadId={threadId}
             onToggleIngredient={toggleIngredient}
+            onGoToStep={goToStep}
           />
         </motion.div>
       ) : (

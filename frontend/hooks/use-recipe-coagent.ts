@@ -91,6 +91,28 @@ function useRecipeCoAgent() {
     [coagent]
   )
 
+  const goToStep = useCallback(
+    (stepIndex: number) => {
+      coagent.setState((previousState) => {
+        const currentState = previousState ?? emptyRecipeContext
+        const stepCount = currentState.recipe?.steps.length ?? 0
+
+        if (!stepCount) {
+          return currentState
+        }
+
+        const clamped = Math.min(Math.max(0, stepIndex), stepCount - 1)
+
+        return {
+          ...currentState,
+          current_step: clamped,
+          cooking_started: true,
+        }
+      })
+    },
+    [coagent]
+  )
+
   return useMemo(
     () => ({
       error:
@@ -101,6 +123,7 @@ function useRecipeCoAgent() {
       isReady: status === "ready",
       originalState,
       running: coagent.running,
+      goToStep,
       setState: coagent.setState,
       start: coagent.start,
       state: coagent.state,
@@ -111,6 +134,7 @@ function useRecipeCoAgent() {
     }),
     [
       coagent.running,
+      goToStep,
       coagent.setState,
       coagent.start,
       coagent.state,
