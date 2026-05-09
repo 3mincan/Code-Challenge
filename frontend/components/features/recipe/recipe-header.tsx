@@ -37,7 +37,7 @@ function RecipeHeader({ recipe, running }: RecipeHeaderProps) {
       </div>
 
       <div className="space-y-4">
-        <Text as="h1" variant="hero" measure="xl">
+        <Text as="h1" variant="hero" measure="xl" className="break-words">
           {recipe.title}
         </Text>
         {recipe.description ? (

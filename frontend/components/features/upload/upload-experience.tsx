@@ -43,9 +43,9 @@ function UploadExperience({ incompleteSession = false }: UploadExperienceProps) 
   return (
     <AppShell>
       <ShellMain>
-        <Section spacing="hero" className="overflow-hidden">
+        <Section spacing="hero" className="overflow-x-hidden pb-6 sm:pb-8">
           <Container>
-            <Stack className="gap-6 pb-2">
+            <Stack className="gap-4 pb-2 sm:gap-6">
               <ConnectionBanner online={online} />
               {incompleteSession ? (
                 <Surface
@@ -72,13 +72,13 @@ function UploadExperience({ incompleteSession = false }: UploadExperienceProps) 
                 </Surface>
               ) : null}
             </Stack>
-            <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+            <div className="grid gap-8 md:grid-cols-2 md:items-start md:gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
               <motion.div
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
               >
-                <Stack className="gap-6 lg:sticky lg:top-10">
+                <Stack className="gap-6 md:sticky md:top-8 md:gap-6 lg:top-10">
                   <div className="flex size-12 items-center justify-center rounded-lg bg-tint-yellow-bold text-ink shadow-elevation-1">
                     <FileUp className="size-6" />
                   </div>

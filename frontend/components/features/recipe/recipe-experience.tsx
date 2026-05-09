@@ -73,7 +73,7 @@ function RecipeExperience({
         <Section
           spacing="lg"
           className={cn(
-            "min-h-screen",
+            "min-h-screen overflow-x-hidden",
             cookingMode ? "bg-canvas" : "bg-surface-soft"
           )}
         >
@@ -89,7 +89,7 @@ function RecipeExperience({
                   role="region"
                   aria-label="Cooking mode controls"
                   className={cn(
-                    "sticky top-0 z-30 -mx-4 space-y-3 sm:-mx-6"
+                    "sticky top-0 z-30 -mx-2 space-y-3 sm:-mx-4 md:-mx-6"
                   )}
                 >
                   <div className="rounded-2xl border border-hairline/80 bg-canvas/95 px-2 py-2 shadow-elevation-2 backdrop-blur-md supports-[backdrop-filter]:bg-canvas/90">
@@ -206,11 +206,11 @@ function RecipeExperience({
                   {...panelCrossfade}
                   className="flex flex-col gap-8"
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
                     <Text variant="caption" measure="none">
                       Recipe Companion
                     </Text>
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex w-full flex-col gap-2 min-[400px]:flex-row min-[400px]:flex-wrap sm:w-auto sm:items-center">
                       <Button
                         variant="outline"
                         size="sm"
@@ -227,10 +227,13 @@ function RecipeExperience({
                     </div>
                   </div>
 
-                  <div className="grid gap-6 lg:grid-cols-[minmax(22rem,0.85fr)_minmax(0,1.15fr)] lg:items-start">
-                    <div className="space-y-6">{sidebar}</div>
+                  <div className="grid gap-6 max-md:gap-8 md:gap-8 lg:grid-cols-[minmax(16rem,0.85fr)_minmax(0,1.15fr)] lg:items-start lg:gap-10">
+                    <div className="order-2 min-w-0 space-y-6 lg:order-1">
+                      {sidebar}
+                    </div>
 
                     <motion.div
+                      className="order-1 min-w-0 lg:order-2"
                       initial={{ opacity: 0, y: 18 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{

@@ -66,8 +66,8 @@ function RecipeHandoff({ response, onReset }: RecipeHandoffProps) {
       transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
     >
       <Surface variant="base" elevation="card" className="space-y-8 p-6 sm:p-8">
-        <Cluster className="justify-between gap-4">
-          <Cluster className="gap-3">
+        <Cluster className="flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <Cluster className="min-w-0 gap-3">
             <span className="flex size-11 items-center justify-center rounded-lg bg-tint-mint text-brand-green">
               <CheckCircle2 className="size-6" />
             </span>
@@ -79,12 +79,16 @@ function RecipeHandoff({ response, onReset }: RecipeHandoffProps) {
                     ? "Updating recipe"
                     : "Recipe ready"}
               </Text>
-              <Text as="h2" variant="h3" measure="none">
+              <Text as="h2" variant="h3" measure="none" className="break-words">
                 {recipe.title}
               </Text>
             </div>
           </Cluster>
-          <Button variant="ghost" onClick={onReset}>
+          <Button
+            variant="ghost"
+            className="w-full shrink-0 sm:w-auto"
+            onClick={onReset}
+          >
             Upload another
           </Button>
         </Cluster>

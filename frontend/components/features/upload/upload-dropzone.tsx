@@ -85,7 +85,7 @@ function UploadDropzone({
         whileTap={disabled ? undefined : { scale: 0.996 }}
         className={cn(
           "motion-standard cursor-pointer rounded-2xl border border-dashed bg-canvas p-6 text-left shadow-elevation-2 transition-[background-color,border-color,box-shadow,transform] sm:p-8",
-          "min-h-[24rem] touch-target flex flex-col justify-between gap-8",
+          "min-h-[clamp(16rem,48dvh,24rem)] touch-target flex flex-col justify-between gap-6 sm:min-h-[22rem] sm:gap-8 md:min-h-[24rem]",
           isDragging
             ? "border-primary bg-tint-lavender shadow-elevation-3"
             : "border-hairline-strong",
