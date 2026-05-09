@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Cluster, Stack } from "@/components/ui/section"
 import { Surface } from "@/components/ui/surface"
 import { Text } from "@/components/ui/typography"
+import { useRecipeCoAgent } from "@/hooks/use-recipe-coagent"
 import type { UploadRecipeResponse } from "@/types/recipe"
 
 type RecipeHandoffProps = {
@@ -23,7 +24,8 @@ function formatMinutes(value: number | null) {
 }
 
 function RecipeHandoff({ response, onReset }: RecipeHandoffProps) {
-  const recipe = response.state.recipe
+  const { isHydrating, running, state } = useRecipeCoAgent()
+  const recipe = state.recipe ?? response.state.recipe
 
   if (!recipe) {
     return null
@@ -46,7 +48,11 @@ function RecipeHandoff({ response, onReset }: RecipeHandoffProps) {
             </span>
             <div>
               <Text variant="caption" measure="none">
-                Recipe ready
+                {isHydrating
+                  ? "Syncing state"
+                  : running
+                    ? "Updating recipe"
+                    : "Recipe ready"}
               </Text>
               <Text as="h2" variant="h3" measure="none">
                 {recipe.title}

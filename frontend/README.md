@@ -70,9 +70,12 @@ config/
 lib/
   api/                 # API client utilities
   query/               # React Query client setup
+  recipe-context.ts    # default RecipeContext shape
+  recipe-session.ts    # session persistence for thread/state hydration
   utils.ts             # shared className helper
 types/
   api.ts               # shared API utility types
+  recipe.ts            # backend RecipeContext and upload response types
 ```
 
 Key decisions:
@@ -85,6 +88,11 @@ Key decisions:
 - `lib/api/client.ts` provides a small typed fetch wrapper without baking in
   recipe-specific business logic.
 - `lib/query/client.ts` keeps React Query defaults in one place.
+- `app/api/copilotkit/route.ts` bridges CopilotKit to the backend AG-UI endpoint
+  with an `HttpAgent` named `recipe_agent`.
+- `hooks/use-recipe-coagent.ts` hydrates `RecipeContext` from the upload response
+  and then reacts to CopilotKit shared state updates. UI should read this state,
+  not assistant message text.
 - Absolute imports use `@/*` with `baseUrl` configured in `tsconfig.json`.
 
 ## Created Foundation Files
