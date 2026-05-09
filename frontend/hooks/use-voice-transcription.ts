@@ -147,5 +147,5 @@ function useVoiceTranscription({
   }
 }
 
-export { getSpeechRecognitionConstructor, isSpeechRecognitionSupported, useVoiceTranscription }
+export { useVoiceTranscription }
 export type { VoiceStatus }

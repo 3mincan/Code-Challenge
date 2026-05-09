@@ -171,5 +171,5 @@ function useRecipeUpload() {
   )
 }
 
-export { MAX_FILE_SIZE, useRecipeUpload }
+export { useRecipeUpload }
 export type { UploadPhase }

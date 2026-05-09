@@ -37,22 +37,6 @@ const springTactile = {
   mass: 0.82,
 }
 
-const motionClasses = {
-  standard:
-    "motion-standard transition-[background-color,border-color,color,box-shadow,transform]",
-  emphasized: "motion-emphasized transition-[opacity,transform]",
-  tactile: "motion-standard transition-transform active:translate-y-px",
-} as const
-
-const fadeUp = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
-  transition: {
-    duration: motionDurations.slow,
-    ease: motionEasings.emphasized,
-  },
-} as const
-
 /** Primary `AnimatePresence` cross-fade for switching layout modes (e.g. browse vs cooking). */
 const panelCrossfade = {
   initial: { opacity: 0, y: 14 },
@@ -75,9 +59,6 @@ const skeletonShimmer = {
 } as const
 
 export {
-  fadeUp,
-  motionClasses,
-  motionDurations,
   motionEasings,
   panelCrossfade,
   skeletonShimmer,

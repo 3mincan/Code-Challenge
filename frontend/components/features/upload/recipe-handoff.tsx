@@ -10,17 +10,11 @@ import { Text } from "@/components/ui/typography"
 import { useRecipeCoAgent } from "@/hooks/use-recipe-coagent"
 import type { UploadRecipeResponse } from "@/types/recipe"
 
+import { formatMinutes } from "@/components/features/recipe/recipe-utils"
+
 type RecipeHandoffProps = {
   response: UploadRecipeResponse
   onReset: () => void
-}
-
-function formatMinutes(value: number | null) {
-  if (!value) {
-    return "Flexible"
-  }
-
-  return `${value} min`
 }
 
 function RecipeHandoff({ response, onReset }: RecipeHandoffProps) {

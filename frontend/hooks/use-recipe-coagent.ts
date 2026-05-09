@@ -53,13 +53,18 @@ function useRecipeCoAgent() {
       return
     }
 
-    storeRecipeSession(
-      {
-        threadId: syncedThreadId,
-        state: coagent.state,
-      },
-      { notify: false }
-    )
+    const pending = coagent.state
+    const id = window.setTimeout(() => {
+      storeRecipeSession(
+        {
+          threadId: syncedThreadId,
+          state: pending,
+        },
+        { notify: false }
+      )
+    }, 200)
+
+    return () => window.clearTimeout(id)
   }, [coagent.state, hydrated, syncedThreadId])
 
   const status: RecipeCoAgentStatus = !hydrated
@@ -169,4 +174,3 @@ function useRecipeCoAgent() {
 }
 
 export { useRecipeCoAgent }
-export type { RecipeCoAgentStatus }
