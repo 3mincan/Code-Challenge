@@ -13,6 +13,7 @@ import { clearRecipeSession } from "@/lib/recipe-session"
 import type { RecipeContext } from "@/types/recipe"
 
 import { CookingProgress } from "./cooking-progress"
+import { CookingVoiceControl } from "./cooking-voice-control"
 import { IngredientsPanel } from "./ingredients-panel"
 import { RecipeHeader } from "./recipe-header"
 import { getCurrentStepIndex } from "./recipe-utils"
@@ -44,6 +45,8 @@ function RecipeExperience({
   }
 
   const currentStepIndex = getCurrentStepIndex(state)
+  const currentStepInstruction =
+    recipe.steps[currentStepIndex]?.instruction ?? ""
 
   const sidebar = (
     <div className="space-y-6">
@@ -81,44 +84,54 @@ function RecipeExperience({
                   )}
                 >
                   <div className="rounded-2xl border border-hairline/80 bg-canvas/95 px-2 py-2 shadow-elevation-2 backdrop-blur-md supports-[backdrop-filter]:bg-canvas/90">
-                    <div className="flex items-center gap-1 sm:gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className="size-12 shrink-0 touch-manipulation rounded-xl sm:size-11"
-                        aria-label="Previous step"
-                        disabled={currentStepIndex <= 0}
-                        onClick={() => onGoToStep(currentStepIndex - 1)}
-                      >
-                        <ChevronLeft className="size-6" strokeWidth={2} />
-                      </Button>
-                      <div className="min-w-0 flex-1 px-1 text-center">
-                        <Text
-                          as="p"
-                          variant="small-medium"
-                          measure="none"
-                          className="truncate text-ink"
+                    <div className="flex items-start gap-2 sm:items-center sm:gap-2">
+                      <CookingVoiceControl
+                        currentStepIndex={currentStepIndex}
+                        stepCount={recipe.steps.length}
+                        currentStepInstruction={currentStepInstruction}
+                        onGoToStep={onGoToStep}
+                        agentBusy={running}
+                      />
+                      <div className="flex min-w-0 flex-1 items-center gap-1 sm:gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="size-12 shrink-0 touch-manipulation rounded-xl sm:size-11"
+                          aria-label="Previous step"
+                          disabled={currentStepIndex <= 0}
+                          onClick={() => onGoToStep(currentStepIndex - 1)}
                         >
-                          {recipe.title}
-                        </Text>
-                        <Text variant="caption" tone="muted" measure="none">
-                          Step {currentStepIndex + 1} of {recipe.steps.length}
-                        </Text>
+                          <ChevronLeft className="size-6" strokeWidth={2} />
+                        </Button>
+                        <div className="min-w-0 flex-1 px-1 text-center">
+                          <Text
+                            as="p"
+                            variant="small-medium"
+                            measure="none"
+                            className="truncate text-ink"
+                          >
+                            {recipe.title}
+                          </Text>
+                          <Text variant="caption" tone="muted" measure="none">
+                            Step {currentStepIndex + 1} of{" "}
+                            {recipe.steps.length}
+                          </Text>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="size-12 shrink-0 touch-manipulation rounded-xl sm:size-11"
+                          aria-label="Next step"
+                          disabled={
+                            currentStepIndex >= recipe.steps.length - 1
+                          }
+                          onClick={() => onGoToStep(currentStepIndex + 1)}
+                        >
+                          <ChevronRight className="size-6" strokeWidth={2} />
+                        </Button>
                       </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className="size-12 shrink-0 touch-manipulation rounded-xl sm:size-11"
-                        aria-label="Next step"
-                        disabled={
-                          currentStepIndex >= recipe.steps.length - 1
-                        }
-                        onClick={() => onGoToStep(currentStepIndex + 1)}
-                      >
-                        <ChevronRight className="size-6" strokeWidth={2} />
-                      </Button>
                     </div>
                     <div className="mt-3 border-t border-hairline-soft px-1 pt-3">
                       <CookingProgress state={state} compact />
