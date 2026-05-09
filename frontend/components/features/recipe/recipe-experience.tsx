@@ -17,11 +17,18 @@ import { getCurrentStepIndex } from "./recipe-utils"
 import { StepsPanel } from "./steps-panel"
 
 type RecipeExperienceProps = {
+  originalState: RecipeContext | null
   running: boolean
   state: RecipeContext
+  onToggleIngredient: (ingredientName: string) => void
 }
 
-function RecipeExperience({ running, state }: RecipeExperienceProps) {
+function RecipeExperience({
+  originalState,
+  running,
+  state,
+  onToggleIngredient,
+}: RecipeExperienceProps) {
   const recipe = state.recipe
 
   if (!recipe) {
@@ -52,6 +59,11 @@ function RecipeExperience({ running, state }: RecipeExperienceProps) {
                 <IngredientsPanel
                   checkedIngredients={state.checked_ingredients}
                   ingredients={recipe.ingredients}
+                  onToggleIngredient={onToggleIngredient}
+                  originalIngredients={
+                    originalState?.recipe?.ingredients ?? recipe.ingredients
+                  }
+                  scaledServings={state.scaled_servings}
                 />
               </div>
 

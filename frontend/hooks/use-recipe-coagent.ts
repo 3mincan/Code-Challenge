@@ -1,12 +1,13 @@
 "use client"
 
 import { useCoAgent } from "@copilotkit/react-core"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { RECIPE_AGENT_NAME } from "@/config/copilot"
 import { emptyRecipeContext } from "@/lib/recipe-context"
 import {
   readRecipeSession,
+  readOriginalRecipeContext,
   storeRecipeSession,
   subscribeToRecipeSession,
 } from "@/lib/recipe-session"
@@ -16,12 +17,14 @@ type RecipeCoAgentStatus = "hydrating" | "missing-session" | "ready"
 
 function useRecipeCoAgent() {
   const [hydrated, setHydrated] = useState(false)
+  const [originalState, setOriginalState] = useState<RecipeContext | null>(null)
   const [threadId, setThreadId] = useState<string | null>(null)
   const [state, setState] = useState<RecipeContext>(emptyRecipeContext)
 
   useEffect(() => {
     const refreshSession = () => {
       const session = readRecipeSession()
+      setOriginalState(readOriginalRecipeContext())
       setThreadId(session?.threadId ?? null)
       setState(session?.state ?? emptyRecipeContext)
       setHydrated(true)
@@ -59,6 +62,29 @@ function useRecipeCoAgent() {
       ? "ready"
       : "missing-session"
 
+  const toggleIngredient = useCallback(
+    (ingredientName: string) => {
+      coagent.setState((previousState) => {
+        const currentState = previousState ?? emptyRecipeContext
+        const checkedIngredients = new Set(
+          currentState.checked_ingredients.map((item) => item.toLowerCase())
+        )
+        const normalisedName = ingredientName.toLowerCase()
+        const nextCheckedIngredients = checkedIngredients.has(normalisedName)
+          ? currentState.checked_ingredients.filter(
+              (item) => item.toLowerCase() !== normalisedName
+            )
+          : [...currentState.checked_ingredients, ingredientName]
+
+        return {
+          ...currentState,
+          checked_ingredients: nextCheckedIngredients,
+        }
+      })
+    },
+    [coagent]
+  )
+
   return useMemo(
     () => ({
       error:
@@ -67,20 +93,26 @@ function useRecipeCoAgent() {
           : null,
       isHydrating: status === "hydrating",
       isReady: status === "ready",
+      originalState,
       running: coagent.running,
+      setState: coagent.setState,
       start: coagent.start,
       state: coagent.state,
       status,
       stop: coagent.stop,
       threadId: syncedThreadId ?? null,
+      toggleIngredient,
     }),
     [
       coagent.running,
+      coagent.setState,
       coagent.start,
       coagent.state,
       coagent.stop,
+      originalState,
       status,
       syncedThreadId,
+      toggleIngredient,
     ]
   )
 }

@@ -96,6 +96,9 @@ Key decisions:
 - `components/features/recipe` contains the tablet-first cooking workspace:
   recipe header, metadata, ingredients, steps, and progress all render from
   `RecipeContext`.
+- Ingredient checklist state is stored in `checked_ingredients`; scaled
+  quantities and substitutions are visualised by comparing live state with the
+  original uploaded recipe snapshot.
 - Absolute imports use `@/*` with `baseUrl` configured in `tsconfig.json`.
 
 ## Created Foundation Files

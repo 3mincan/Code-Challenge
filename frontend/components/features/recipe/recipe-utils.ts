@@ -26,6 +26,47 @@ function formatQuantity(ingredient: Ingredient) {
   return parts.join(" ")
 }
 
+function formatIngredientAmount(ingredient: Ingredient) {
+  return [ingredient.quantity ?? null, ingredient.unit]
+    .filter(Boolean)
+    .join(" ")
+}
+
+function getIngredientSignature(ingredient: Ingredient | undefined) {
+  if (!ingredient) {
+    return ""
+  }
+
+  return `${ingredient.name.toLowerCase()}|${ingredient.unit ?? ""}|${
+    ingredient.quantity ?? ""
+  }`
+}
+
+function didIngredientScale(
+  current: Ingredient,
+  original: Ingredient | undefined
+) {
+  if (!original) {
+    return false
+  }
+
+  return (
+    current.name.toLowerCase() === original.name.toLowerCase() &&
+    getIngredientSignature(current) !== getIngredientSignature(original)
+  )
+}
+
+function didIngredientSubstitute(
+  current: Ingredient,
+  original: Ingredient | undefined
+) {
+  if (!original) {
+    return false
+  }
+
+  return current.name.toLowerCase() !== original.name.toLowerCase()
+}
+
 function getTotalTime(recipe: Recipe) {
   const total =
     (recipe.prep_time_minutes ?? 0) + (recipe.cook_time_minutes ?? 0)
@@ -53,6 +94,9 @@ function getProgressPercent(state: RecipeContext) {
 }
 
 export {
+  didIngredientScale,
+  didIngredientSubstitute,
+  formatIngredientAmount,
   formatMinutes,
   formatQuantity,
   getCurrentStepIndex,
