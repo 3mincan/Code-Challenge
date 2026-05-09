@@ -17,6 +17,7 @@ import { RECIPE_AGENT_NAME } from "@/config/copilot"
 import { cn } from "@/lib/utils"
 import type { RecipeContext } from "@/types/recipe"
 
+import { getRecipeChefChatProps } from "./chef-chat-experience"
 import { getCurrentStepIndex } from "./recipe-utils"
 
 type RecipeChefAssistantProps = {
@@ -156,12 +157,15 @@ function RecipeChefAssistant({ state, threadId }: RecipeChefAssistantProps) {
     recipe?.ingredients[0]?.name,
   ])
 
+  const chatExperienceProps = useMemo(() => getRecipeChefChatProps(), [])
+
   if (!recipe || !threadId) {
     return null
   }
 
   return (
     <CopilotPopup
+      {...chatExperienceProps}
       agentId={RECIPE_AGENT_NAME}
       threadId={threadId}
       defaultOpen={false}
