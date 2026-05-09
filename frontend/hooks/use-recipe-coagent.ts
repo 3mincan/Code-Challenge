@@ -113,8 +113,24 @@ function useRecipeCoAgent() {
     [coagent]
   )
 
-  const incompleteSession =
-    status === "ready" && Boolean(syncedThreadId) && !coagent.state.recipe
+  /**
+   * Warn only for a **persisted** thread plus saved context without a recipe.
+   * If `sessionStorage` still holds a recipe, do not show — even when Copilot
+   * has temporarily cleared `coagent.state`. If the agent has a recipe again,
+   * hide the banner regardless of a stale storage row before the next persist.
+   */
+  const incompleteSession = useMemo(() => {
+    if (status !== "ready" || !syncedThreadId) {
+      return false
+    }
+    if (coagent.state.recipe) {
+      return false
+    }
+    const persisted = readRecipeSession()
+    return Boolean(
+      persisted?.threadId && persisted.threadId === syncedThreadId && !persisted.state.recipe
+    )
+  }, [coagent.state.recipe, status, syncedThreadId])
 
   return useMemo(
     () => ({
