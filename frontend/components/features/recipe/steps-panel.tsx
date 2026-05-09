@@ -4,13 +4,13 @@ import { AnimatePresence, motion } from "framer-motion"
 import { AlertCircle, Check, Clock3 } from "lucide-react"
 import { useEffect, useRef } from "react"
 
+import { motionEasings, springTactile } from "@/components/ui/motion"
 import { Text } from "@/components/ui/typography"
 import { cn } from "@/lib/utils"
 import type { RecipeStep } from "@/types/recipe"
 
 import { formatMinutes } from "./recipe-utils"
 
-const stepEase = [0.16, 1, 0.3, 1] as const
 const swipePx = 56
 
 type StepsPanelProps = {
@@ -60,7 +60,7 @@ function StepsPanel({
       layout
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.14, duration: 0.36, ease: stepEase }}
+      transition={{ delay: 0.14, duration: 0.36, ease: motionEasings.emphasized }}
       className={cn(
         "rounded-xl border border-hairline bg-canvas p-5 shadow-elevation-1 sm:p-6",
         immersive &&
@@ -135,7 +135,7 @@ function StepsPanel({
                     scale: current ? (immersive ? 1.08 : 1.04) : 1,
                     opacity: current ? 1 : done ? 0.92 : 0.65,
                   }}
-                  transition={{ duration: 0.35, ease: stepEase }}
+                  transition={{ duration: 0.35, ease: motionEasings.emphasized }}
                 />
               )
             })}
@@ -198,12 +198,12 @@ function StepsPanel({
                 y: 0,
               }}
               transition={{
-                layout: { duration: 0.32, ease: stepEase },
+                layout: { duration: 0.32, ease: motionEasings.emphasized },
                 delay: immersive ? 0 : index * 0.02,
                 duration: immersive ? 0.34 : 0.28,
-                ease: stepEase,
-                  opacity: { duration: 0.35, ease: stepEase },
-                  scale: { duration: 0.35, ease: stepEase },
+                ease: motionEasings.emphasized,
+                  opacity: { duration: 0.35, ease: motionEasings.emphasized },
+                  scale: { duration: 0.35, ease: motionEasings.emphasized },
               }}
               className={cn(shellClass, "relative")}
               aria-current={isCurrent ? "step" : undefined}
@@ -265,7 +265,7 @@ function StepsPanel({
                         initial={{ scale: 0.72, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.72, opacity: 0 }}
-                        transition={{ duration: 0.22, ease: stepEase }}
+                        transition={springTactile}
                       >
                         <Check className="size-5 sm:size-6" strokeWidth={2.5} />
                       </motion.span>
@@ -301,7 +301,7 @@ function StepsPanel({
                       }}
                       transition={{
                         duration: immersive && isCurrent ? 0.32 : 0.28,
-                        ease: stepEase,
+                        ease: motionEasings.emphasized,
                       }}
                     >
                       <Text
@@ -365,7 +365,7 @@ function StepsPanel({
                     <motion.div
                       initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.28, ease: stepEase }}
+                      transition={{ duration: 0.28, ease: motionEasings.emphasized }}
                       className="rounded-lg bg-canvas/90 p-3 ring-1 ring-hairline-soft sm:p-4"
                     >
                       <Text variant="small-medium" measure="none">

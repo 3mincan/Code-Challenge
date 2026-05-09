@@ -5,6 +5,7 @@ import { Mic } from "lucide-react"
 import { useCallback, useState } from "react"
 
 import { Button } from "@/components/ui/button"
+import { TactileButton } from "@/components/ui/tactile-button"
 import { Text } from "@/components/ui/typography"
 import { routeCookingVoiceCommand } from "@/lib/cooking-voice-commands"
 import { cn } from "@/lib/utils"
@@ -92,7 +93,7 @@ function CookingVoiceControl({
 
   return (
     <div className={cn("flex flex-col items-stretch gap-1", className)}>
-      <Button
+      <TactileButton
         type="button"
         variant={listening ? "primary" : "outline"}
         size="icon"
@@ -121,7 +122,7 @@ function CookingVoiceControl({
           strokeWidth={listening ? 2.25 : 2}
           aria-hidden
         />
-      </Button>
+      </TactileButton>
 
       <span className="sr-only" role="status" aria-live="polite">
         {liveMessage}

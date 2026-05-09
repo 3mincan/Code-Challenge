@@ -3,6 +3,8 @@
 import { AnimatePresence, motion } from "framer-motion"
 import { Check, RefreshCw, Replace } from "lucide-react"
 
+import { motionEasings, springTactile, tactilePointer } from "@/components/ui/motion"
+
 import { Text } from "@/components/ui/typography"
 import { cn } from "@/lib/utils"
 import type { Ingredient } from "@/types/recipe"
@@ -43,7 +45,7 @@ function IngredientsPanel({
       layout
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.08, duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ delay: 0.08, duration: 0.36, ease: motionEasings.emphasized }}
       className={cn(
         "rounded-xl border border-hairline bg-canvas p-5 shadow-elevation-1 sm:p-6",
         "transition-[box-shadow,ring] duration-300",
@@ -71,7 +73,7 @@ function IngredientsPanel({
               className="h-full rounded-full bg-brand-green"
               initial={{ width: 0 }}
               animate={{ width: `${completion}%` }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.35, ease: motionEasings.emphasized }}
             />
           </div>
           <Text variant="small" tone="muted" measure="none">
@@ -88,7 +90,7 @@ function IngredientsPanel({
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.3, ease: motionEasings.emphasized }}
               className="rounded-lg bg-tint-sky p-3 text-body-sm-medium text-ink"
             >
               Quantities updated for {scaledServings} servings.
@@ -110,11 +112,12 @@ function IngredientsPanel({
               transition={{ layout: { duration: 0.32, ease: [0.16, 1, 0.3, 1] } }}
               key={`ingredient-row-${index}`}
             >
-              <button
+              <motion.button
                 type="button"
                 role="checkbox"
                 aria-checked={isChecked}
                 onClick={() => onToggleIngredient(ingredient.name)}
+                {...tactilePointer}
                 className={
                   isChecked
                     ? "motion-standard flex min-h-16 w-full items-start gap-3 rounded-lg border border-brand-green bg-tint-mint p-3 text-left shadow-elevation-1"
@@ -131,9 +134,10 @@ function IngredientsPanel({
                   <AnimatePresence>
                     {isChecked ? (
                       <motion.span
-                        initial={{ scale: 0.6, opacity: 0 }}
+                        initial={{ scale: 0.72, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.6, opacity: 0 }}
+                        exit={{ scale: 0.72, opacity: 0 }}
+                        transition={springTactile}
                       >
                         <Check className="size-5" />
                       </motion.span>
@@ -146,7 +150,7 @@ function IngredientsPanel({
                     key={getIngredientSignature(ingredient)}
                     initial={{ opacity: 0.72 }}
                     animate={{ opacity: 1 }}
-                    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 0.25, ease: motionEasings.emphasized }}
                     className={
                       isChecked
                         ? "block text-body-md-medium text-ink line-through decoration-brand-green/60"
@@ -164,7 +168,7 @@ function IngredientsPanel({
                           initial={{ opacity: 0, scale: 0.92, x: -6 }}
                           animate={{ opacity: 1, scale: 1, x: 0 }}
                           exit={{ opacity: 0, scale: 0.96 }}
-                          transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+                          transition={{ duration: 0.24, ease: motionEasings.emphasized }}
                           className="inline-flex items-center gap-1 rounded-full bg-tint-sky px-2 py-0.5 text-body-sm-medium text-ink"
                         >
                           <RefreshCw className="size-3.5" />
@@ -177,7 +181,7 @@ function IngredientsPanel({
                           initial={{ opacity: 0, scale: 0.92, x: -6 }}
                           animate={{ opacity: 1, scale: 1, x: 0 }}
                           exit={{ opacity: 0, scale: 0.96 }}
-                          transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
+                          transition={{ duration: 0.26, ease: motionEasings.emphasized }}
                           className="inline-flex items-center gap-1 rounded-full bg-tint-lavender px-2 py-0.5 text-body-sm-medium text-brand-purple-800"
                         >
                           <Replace className="size-3.5" />
@@ -187,7 +191,7 @@ function IngredientsPanel({
                     </AnimatePresence>
                   </span>
                 </span>
-              </button>
+              </motion.button>
             </motion.li>
           )
         })}

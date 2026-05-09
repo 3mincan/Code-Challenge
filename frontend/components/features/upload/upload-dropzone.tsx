@@ -5,7 +5,9 @@ import { FileText, Upload, X } from "lucide-react"
 import { useRef, useState, type DragEvent } from "react"
 
 import { Button } from "@/components/ui/button"
+import { TactileButton } from "@/components/ui/tactile-button"
 import { Cluster, Stack } from "@/components/ui/section"
+import { transitions } from "@/components/ui/motion"
 import { Text } from "@/components/ui/typography"
 import { cn } from "@/lib/utils"
 
@@ -71,7 +73,10 @@ function UploadDropzone({
         }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
-        whileTap={disabled ? undefined : { scale: 0.995 }}
+        whileHover={
+          disabled ? undefined : { scale: 1.004, transition: transitions.quick }
+        }
+        whileTap={disabled ? undefined : { scale: 0.996 }}
         className={cn(
           "motion-standard cursor-pointer rounded-2xl border border-dashed bg-canvas p-6 text-left shadow-elevation-2 transition-[background-color,border-color,box-shadow,transform] sm:p-8",
           "min-h-[24rem] touch-target flex flex-col justify-between gap-8",
@@ -181,14 +186,14 @@ function UploadDropzone({
             </p>
           )}
         </AnimatePresence>
-        <Button
+        <TactileButton
           type="button"
           size="lg"
           disabled={!file || disabled}
           onClick={onUpload}
         >
           Parse recipe
-        </Button>
+        </TactileButton>
       </div>
     </div>
   )

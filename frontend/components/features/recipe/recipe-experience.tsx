@@ -1,11 +1,13 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import { ChefHat, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react"
 import { useState } from "react"
 
 import { AppShell, ShellMain } from "@/components/layout/app-shell"
 import { Button } from "@/components/ui/button"
+import { panelCrossfade } from "@/components/ui/motion"
+import { TactileButton } from "@/components/ui/tactile-button"
 import { Container, Section } from "@/components/ui/section"
 import { Text } from "@/components/ui/typography"
 import { cn } from "@/lib/utils"
@@ -76,8 +78,13 @@ function RecipeExperience({
           )}
         >
           <Container>
-            {cookingMode ? (
-              <div className="mx-auto max-w-2xl space-y-5 pb-16 pt-2 sm:pb-20">
+            <AnimatePresence mode="wait" initial={false}>
+              {cookingMode ? (
+                <motion.div
+                  key="cooking"
+                  {...panelCrossfade}
+                  className="mx-auto max-w-2xl space-y-5 pb-16 pt-2 sm:pb-20"
+                >
                 <div
                   className={cn(
                     "sticky top-0 z-30 -mx-4 space-y-3 sm:-mx-6"
@@ -93,7 +100,7 @@ function RecipeExperience({
                         agentBusy={running}
                       />
                       <div className="flex min-w-0 flex-1 items-center gap-1 sm:gap-2">
-                        <Button
+                        <TactileButton
                           type="button"
                           variant="outline"
                           size="icon"
@@ -103,7 +110,7 @@ function RecipeExperience({
                           onClick={() => onGoToStep(currentStepIndex - 1)}
                         >
                           <ChevronLeft className="size-6" strokeWidth={2} />
-                        </Button>
+                        </TactileButton>
                         <div className="min-w-0 flex-1 px-1 text-center">
                           <Text
                             as="p"
@@ -118,7 +125,7 @@ function RecipeExperience({
                             {recipe.steps.length}
                           </Text>
                         </div>
-                        <Button
+                        <TactileButton
                           type="button"
                           variant="outline"
                           size="icon"
@@ -130,7 +137,7 @@ function RecipeExperience({
                           onClick={() => onGoToStep(currentStepIndex + 1)}
                         >
                           <ChevronRight className="size-6" strokeWidth={2} />
-                        </Button>
+                        </TactileButton>
                       </div>
                     </div>
                     <div className="mt-3 border-t border-hairline-soft px-1 pt-3">
@@ -161,23 +168,13 @@ function RecipeExperience({
                   </div>
                 </div>
 
-                <motion.div
-                  key="steps-immersive"
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.38,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                >
-                  <StepsPanel
-                    currentStepIndex={currentStepIndex}
-                    steps={recipe.steps}
-                    immersive
-                    agentBusy={running}
-                    onStepChange={onGoToStep}
-                  />
-                </motion.div>
+                <StepsPanel
+                  currentStepIndex={currentStepIndex}
+                  steps={recipe.steps}
+                  immersive
+                  agentBusy={running}
+                  onStepChange={onGoToStep}
+                />
 
                 <details
                   className={cn(
@@ -199,51 +196,56 @@ function RecipeExperience({
                     {sidebar}
                   </div>
                 </details>
-              </div>
-            ) : (
-              <>
-                <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-                  <Text variant="caption" measure="none">
-                    Recipe Companion
-                  </Text>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      aria-pressed={cookingMode}
-                      onClick={() => setCookingMode((open) => !open)}
-                    >
-                      <ChefHat data-icon="inline-start" />
-                      Cooking mode
-                    </Button>
-                    <Button variant="ghost" onClick={clearRecipeSession}>
-                      <RotateCcw data-icon="inline-start" />
-                      Upload another
-                    </Button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="browse"
+                  {...panelCrossfade}
+                  className="flex flex-col gap-8"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <Text variant="caption" measure="none">
+                      Recipe Companion
+                    </Text>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        aria-pressed={cookingMode}
+                        onClick={() => setCookingMode((open) => !open)}
+                      >
+                        <ChefHat data-icon="inline-start" />
+                        Cooking mode
+                      </Button>
+                      <Button variant="ghost" onClick={clearRecipeSession}>
+                        <RotateCcw data-icon="inline-start" />
+                        Upload another
+                      </Button>
+                    </div>
                   </div>
-                </div>
 
-                <div className="grid gap-6 lg:grid-cols-[minmax(22rem,0.85fr)_minmax(0,1.15fr)] lg:items-start">
-                  <div className="space-y-6">{sidebar}</div>
+                  <div className="grid gap-6 lg:grid-cols-[minmax(22rem,0.85fr)_minmax(0,1.15fr)] lg:items-start">
+                    <div className="space-y-6">{sidebar}</div>
 
-                  <motion.div
-                    initial={{ opacity: 0, y: 18 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      delay: 0.1,
-                      duration: 0.38,
-                      ease: [0.16, 1, 0.3, 1],
-                    }}
-                  >
-                    <StepsPanel
-                      currentStepIndex={currentStepIndex}
-                      steps={recipe.steps}
-                      agentBusy={running}
-                    />
-                  </motion.div>
-                </div>
-              </>
-            )}
+                    <motion.div
+                      initial={{ opacity: 0, y: 18 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        delay: 0.1,
+                        duration: 0.38,
+                        ease: [0.16, 1, 0.3, 1],
+                      }}
+                    >
+                      <StepsPanel
+                        currentStepIndex={currentStepIndex}
+                        steps={recipe.steps}
+                        agentBusy={running}
+                      />
+                    </motion.div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Container>
         </Section>
         <RecipeChefAssistant state={state} threadId={threadId} />

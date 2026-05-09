@@ -3,6 +3,8 @@
 import { motion } from "framer-motion"
 import { ChefHat, Clock, Flame, UsersRound } from "lucide-react"
 
+import { motionEasings } from "@/components/ui/motion"
+
 import { Badge } from "@/components/ui/surface"
 import { Text } from "@/components/ui/typography"
 import type { Recipe } from "@/types/recipe"
@@ -46,53 +48,81 @@ function RecipeHeader({ recipe, running }: RecipeHeaderProps) {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-lg bg-tint-cream p-4">
-          <UsersRound className="mb-4 size-5 text-brand-purple" />
-          <Text variant="caption" measure="none">
-            Servings
-          </Text>
+        {[
+          {
+            key: "servings",
+            surface: "rounded-lg bg-tint-cream p-4",
+            icon: <UsersRound className="mb-4 size-5 text-brand-purple" />,
+            caption: "Servings",
+            body: (
+              <motion.div
+                key={recipe.servings}
+                initial={{ scale: 0.94, opacity: 0.82 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 440,
+                  damping: 28,
+                }}
+              >
+                <Text variant="h4" measure="none">
+                  {recipe.servings}
+                </Text>
+              </motion.div>
+            ),
+          },
+          {
+            key: "total",
+            surface: "rounded-lg bg-tint-sky p-4",
+            icon: <Clock className="mb-4 size-5 text-link-blue" />,
+            caption: "Total time",
+            body: (
+              <Text variant="h4" measure="none">
+                {formatMinutes(totalTime)}
+              </Text>
+            ),
+          },
+          {
+            key: "prep",
+            surface: "rounded-lg bg-tint-peach p-4",
+            icon: <ChefHat className="mb-4 size-5 text-brand-orange" />,
+            caption: "Prep",
+            body: (
+              <Text variant="h4" measure="none">
+                {formatMinutes(recipe.prep_time_minutes)}
+              </Text>
+            ),
+          },
+          {
+            key: "cook",
+            surface: "rounded-lg bg-tint-rose p-4",
+            icon: <Flame className="mb-4 size-5 text-brand-pink" />,
+            caption: "Cook",
+            body: (
+              <Text variant="h4" measure="none">
+                {formatMinutes(recipe.cook_time_minutes)}
+              </Text>
+            ),
+          },
+        ].map((card, index) => (
           <motion.div
-            key={recipe.servings}
-            initial={{ scale: 0.94, opacity: 0.82 }}
-            animate={{ scale: 1, opacity: 1 }}
+            key={card.key}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{
-              type: "spring",
-              stiffness: 440,
-              damping: 28,
+              duration: 0.34,
+              ease: motionEasings.emphasized,
+              delay: 0.05 + index * 0.06,
             }}
+            className={card.surface}
           >
-            <Text variant="h4" measure="none">
-              {recipe.servings}
+            {card.icon}
+            <Text variant="caption" measure="none">
+              {card.caption}
             </Text>
+            {card.body}
           </motion.div>
-        </div>
-        <div className="rounded-lg bg-tint-sky p-4">
-          <Clock className="mb-4 size-5 text-link-blue" />
-          <Text variant="caption" measure="none">
-            Total time
-          </Text>
-          <Text variant="h4" measure="none">
-            {formatMinutes(totalTime)}
-          </Text>
-        </div>
-        <div className="rounded-lg bg-tint-peach p-4">
-          <ChefHat className="mb-4 size-5 text-brand-orange" />
-          <Text variant="caption" measure="none">
-            Prep
-          </Text>
-          <Text variant="h4" measure="none">
-            {formatMinutes(recipe.prep_time_minutes)}
-          </Text>
-        </div>
-        <div className="rounded-lg bg-tint-rose p-4">
-          <Flame className="mb-4 size-5 text-brand-pink" />
-          <Text variant="caption" measure="none">
-            Cook
-          </Text>
-          <Text variant="h4" measure="none">
-            {formatMinutes(recipe.cook_time_minutes)}
-          </Text>
-        </div>
+        ))}
       </div>
     </motion.header>
   )
