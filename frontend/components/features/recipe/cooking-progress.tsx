@@ -108,7 +108,7 @@ function CookingProgress({ state, compact = false }: CookingProgressProps) {
         initial={{ opacity: 0.92 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-        className="rounded-lg bg-on-dark/10 p-4"
+        className="rounded-xl bg-on-dark/10 p-4"
       >
         <Text variant="caption" tone="inverse-muted" measure="none">
           Current step

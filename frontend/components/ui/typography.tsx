@@ -70,7 +70,10 @@ function Text<T extends ElementType = "p">({
 
 const Eyebrow = ({ className, ...props }: ComponentPropsWithoutRef<"p">) => (
   <p
-    className={cn("text-caption-bold max-w-prose text-stone", className)}
+    className={cn(
+      "text-caption-bold max-w-prose uppercase text-stone",
+      className,
+    )}
     {...props}
   />
 )

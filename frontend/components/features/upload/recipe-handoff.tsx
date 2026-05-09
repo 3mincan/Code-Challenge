@@ -68,7 +68,7 @@ function RecipeHandoff({ response, onReset }: RecipeHandoffProps) {
       <Surface variant="base" elevation="card" className="space-y-8 p-6 sm:p-8">
         <Cluster className="flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
           <Cluster className="min-w-0 gap-3">
-            <span className="flex size-11 items-center justify-center rounded-lg bg-tint-mint text-brand-green">
+            <span className="flex size-11 items-center justify-center rounded-xl bg-tint-mint text-brand-green">
               <CheckCircle2 className="size-6" />
             </span>
             <div>
@@ -100,7 +100,7 @@ function RecipeHandoff({ response, onReset }: RecipeHandoffProps) {
         ) : null}
 
         <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-lg bg-tint-cream p-4 text-charcoal">
+          <Surface variant="cream" className="p-4 text-charcoal">
             <UsersRound className="mb-5 size-5 text-brand-purple" />
             <Text variant="caption" measure="none">
               Servings
@@ -108,8 +108,8 @@ function RecipeHandoff({ response, onReset }: RecipeHandoffProps) {
             <Text variant="h4" measure="none">
               {recipe.servings}
             </Text>
-          </div>
-          <div className="rounded-lg bg-tint-sky p-4 text-charcoal">
+          </Surface>
+          <Surface variant="sky" className="p-4 text-charcoal">
             <Clock className="mb-5 size-5 text-link-blue" />
             <Text variant="caption" measure="none">
               Total time
@@ -117,8 +117,8 @@ function RecipeHandoff({ response, onReset }: RecipeHandoffProps) {
             <Text variant="h4" measure="none">
               {formatMinutes(totalTime)}
             </Text>
-          </div>
-          <div className="rounded-lg bg-tint-lavender p-4 text-charcoal">
+          </Surface>
+          <Surface variant="lavender" className="p-4 text-charcoal">
             <CheckCircle2 className="mb-5 size-5 text-brand-purple" />
             <Text variant="caption" measure="none">
               Parsed
@@ -126,7 +126,7 @@ function RecipeHandoff({ response, onReset }: RecipeHandoffProps) {
             <Text variant="h4" measure="none">
               {recipe.ingredients.length} ingredients
             </Text>
-          </div>
+          </Surface>
         </div>
 
         <Stack className="gap-3">
@@ -154,9 +154,10 @@ function RecipeHandoff({ response, onReset }: RecipeHandoffProps) {
 
         <div id="recipe-steps-preview" className="space-y-3 scroll-mt-8">
           {recipe.steps.slice(0, 3).map((step) => (
-            <div
+            <Surface
               key={step.step_number}
-              className="rounded-lg border border-hairline bg-surface-soft p-4"
+              variant="base"
+              className="space-y-2 bg-surface-soft p-4"
             >
               <Text variant="caption" measure="none">
                 Step {step.step_number}
@@ -164,7 +165,7 @@ function RecipeHandoff({ response, onReset }: RecipeHandoffProps) {
               <Text className="mt-2" measure="none">
                 {step.instruction}
               </Text>
-            </div>
+            </Surface>
           ))}
         </div>
       </Surface>

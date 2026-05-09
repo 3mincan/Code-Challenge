@@ -183,7 +183,7 @@ function StepsPanel({
           )
 
           const badgeClass = cn(
-            "flex shrink-0 items-center justify-center rounded-lg text-body-md-medium motion-standard transition-colors duration-300",
+            "flex shrink-0 items-center justify-center rounded-xl text-body-md-medium motion-standard transition-colors duration-300",
             immersive && isCurrent
               ? "size-12 text-xl font-semibold sm:size-14 sm:text-2xl"
               : "size-11 sm:size-12",
@@ -398,7 +398,7 @@ function StepsPanel({
                       initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.28, ease: motionEasings.emphasized }}
-                      className="rounded-lg bg-canvas/90 p-3 ring-1 ring-hairline-soft sm:p-4"
+                      className="rounded-xl bg-canvas/90 p-3 ring-1 ring-hairline-soft sm:p-4"
                     >
                       <Text variant="small-medium" measure="none">
                         Tips

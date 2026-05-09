@@ -79,7 +79,7 @@ function UploadExperience({ incompleteSession = false }: UploadExperienceProps) 
                 transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
               >
                 <Stack className="gap-6 md:sticky md:top-8 md:gap-6 lg:top-10">
-                  <div className="flex size-12 items-center justify-center rounded-lg bg-tint-yellow-bold text-ink shadow-elevation-1">
+                  <div className="flex size-12 items-center justify-center rounded-xl bg-tint-yellow-bold text-ink shadow-elevation-1">
                     <FileUp className="size-6" />
                   </div>
                   <Stack className="gap-4">

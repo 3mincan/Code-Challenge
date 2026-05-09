@@ -51,12 +51,15 @@ function Container({ className, ...props }: ComponentPropsWithoutRef<"div">) {
 }
 
 const Stack = ({ className, ...props }: ComponentPropsWithoutRef<"div">) => (
-  <div className={cn("flex flex-col gap-4", className)} {...props} />
+  <div className={cn("flex flex-col gap-[var(--space-md)]", className)} {...props} />
 )
 
 const Cluster = ({ className, ...props }: ComponentPropsWithoutRef<"div">) => (
   <div
-    className={cn("flex flex-wrap items-center gap-3", className)}
+    className={cn(
+      "flex flex-wrap items-center gap-[var(--space-sm)]",
+      className,
+    )}
     {...props}
   />
 )

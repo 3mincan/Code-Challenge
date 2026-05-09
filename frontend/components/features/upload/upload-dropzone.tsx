@@ -5,6 +5,7 @@ import { FileText, Upload, X } from "lucide-react"
 import { useId, useRef, useState, type DragEvent } from "react"
 
 import { Button } from "@/components/ui/button"
+import { Panel } from "@/components/ui/panel"
 import { TactileButton } from "@/components/ui/tactile-button"
 import { Cluster, Stack } from "@/components/ui/section"
 import { transitions } from "@/components/ui/motion"
@@ -106,7 +107,7 @@ function UploadDropzone({
         />
 
         <Stack className="gap-5">
-          <div className="flex size-14 items-center justify-center rounded-lg bg-tint-yellow text-ink shadow-elevation-1">
+          <div className="flex size-14 items-center justify-center rounded-xl bg-tint-yellow text-ink shadow-elevation-1">
             <Upload className="size-6" />
           </div>
           <Stack className="gap-3">
@@ -128,35 +129,36 @@ function UploadDropzone({
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
-              className="rounded-lg border border-hairline bg-surface-soft p-4"
             >
-              <Cluster className="justify-between gap-4">
-                <Cluster className="min-w-0 gap-3">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-canvas text-ink">
-                    <FileText className="size-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-body-sm-medium text-ink">
-                      {file.name}
-                    </p>
-                    <p className="text-body-sm text-slate">
-                      {formatFileSize(file.size)}
-                    </p>
-                  </div>
+              <Panel className="bg-surface-soft p-4">
+                <Cluster className="justify-between gap-4">
+                  <Cluster className="min-w-0 gap-3">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-canvas text-ink">
+                      <FileText className="size-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-body-sm-medium text-ink">
+                        {file.name}
+                      </p>
+                      <p className="text-body-sm text-slate">
+                        {formatFileSize(file.size)}
+                      </p>
+                    </div>
+                  </Cluster>
+                  <Button
+                    type="button"
+                    size="icon-sm"
+                    variant="ghost"
+                    aria-label="Remove selected file"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onFileSelect(null)
+                    }}
+                  >
+                    <X />
+                  </Button>
                 </Cluster>
-                <Button
-                  type="button"
-                  size="icon-sm"
-                  variant="ghost"
-                  aria-label="Remove selected file"
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    onFileSelect(null)
-                  }}
-                >
-                  <X />
-                </Button>
-              </Cluster>
+              </Panel>
             </motion.div>
           ) : (
             <motion.div

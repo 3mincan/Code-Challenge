@@ -45,7 +45,7 @@ function RecipeLoadingSkeleton() {
                 ...transitions.quick,
                 delay: 0.04 + index * 0.05,
               }}
-              className="rounded-lg border border-hairline p-3"
+              className="rounded-xl border border-hairline p-3"
             >
               <SkeletonLine className={width} />
             </motion.div>

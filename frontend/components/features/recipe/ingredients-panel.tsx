@@ -92,7 +92,7 @@ function IngredientsPanel({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.3, ease: motionEasings.emphasized }}
-              className="rounded-lg bg-tint-sky p-3 text-body-sm-medium text-ink"
+              className="rounded-xl bg-tint-sky p-3 text-body-sm-medium text-ink"
             >
               Quantities updated for {scaledServings} servings.
             </motion.div>
@@ -121,8 +121,8 @@ function IngredientsPanel({
                 {...tactilePointer}
                 className={
                   isChecked
-                    ? "motion-standard flex min-h-16 w-full items-start gap-3 rounded-lg border border-brand-green bg-tint-mint p-3 text-left shadow-elevation-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
-                    : "motion-standard flex min-h-16 w-full items-start gap-3 rounded-lg border border-transparent bg-surface-soft p-3 text-left hover:border-hairline-strong hover:bg-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
+                    ? "motion-standard flex min-h-16 w-full items-start gap-3 rounded-xl border border-brand-green bg-tint-mint p-3 text-left shadow-elevation-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
+                    : "motion-standard flex min-h-16 w-full items-start gap-3 rounded-xl border border-transparent bg-surface-soft p-3 text-left hover:border-hairline-strong hover:bg-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
                 }
               >
                 <span

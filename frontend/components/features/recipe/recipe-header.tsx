@@ -51,7 +51,7 @@ function RecipeHeader({ recipe, running }: RecipeHeaderProps) {
         {[
           {
             key: "servings",
-            surface: "rounded-lg bg-tint-cream p-4",
+            surface: "rounded-xl bg-tint-cream p-4",
             icon: <UsersRound className="mb-4 size-5 text-brand-purple" />,
             caption: "Servings",
             body: (
@@ -73,7 +73,7 @@ function RecipeHeader({ recipe, running }: RecipeHeaderProps) {
           },
           {
             key: "total",
-            surface: "rounded-lg bg-tint-sky p-4",
+            surface: "rounded-xl bg-tint-sky p-4",
             icon: <Clock className="mb-4 size-5 text-link-blue" />,
             caption: "Total time",
             body: (
@@ -84,7 +84,7 @@ function RecipeHeader({ recipe, running }: RecipeHeaderProps) {
           },
           {
             key: "prep",
-            surface: "rounded-lg bg-tint-peach p-4",
+            surface: "rounded-xl bg-tint-peach p-4",
             icon: <ChefHat className="mb-4 size-5 text-brand-orange" />,
             caption: "Prep",
             body: (
@@ -95,7 +95,7 @@ function RecipeHeader({ recipe, running }: RecipeHeaderProps) {
           },
           {
             key: "cook",
-            surface: "rounded-lg bg-tint-rose p-4",
+            surface: "rounded-xl bg-tint-rose p-4",
             icon: <Flame className="mb-4 size-5 text-brand-pink" />,
             caption: "Cook",
             body: (
