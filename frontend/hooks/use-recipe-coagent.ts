@@ -1,59 +1,159 @@
 "use client"
 
 import { useCoAgent } from "@copilotkit/react-core"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useAgent } from "@copilotkit/react-core/v2"
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react"
 
 import { RECIPE_AGENT_NAME } from "@/config/copilot"
 import { emptyRecipeContext } from "@/lib/recipe-context"
 import {
+  clearCopilotRunError,
+  getCopilotRunErrorSnapshot,
+  publishCopilotRunError,
+  subscribeCopilotRunError,
+} from "@/lib/copilot-run-error-store"
+import { getUserFacingMessage } from "@/lib/errors/user-message"
+import {
+  readRecipeRecord,
   readRecipeSession,
-  readOriginalRecipeContext,
+  setActiveRecipeId,
   storeRecipeSession,
-  subscribeToRecipeSession,
 } from "@/lib/recipe-session"
 import type { RecipeContext } from "@/types/recipe"
 
-type RecipeCoAgentStatus = "hydrating" | "missing-session" | "ready"
+type RecipeCoAgentStatus = "missing-session" | "ready"
+
+function initialStateForRecipe(recipeId: string): RecipeContext {
+  if (typeof window === "undefined") {
+    return emptyRecipeContext
+  }
+  return readRecipeRecord(recipeId)?.state ?? emptyRecipeContext
+}
+
+function initialThreadForRecipe(recipeId: string): string | null {
+  if (typeof window === "undefined") {
+    return null
+  }
+  return readRecipeRecord(recipeId)?.threadId ?? null
+}
+
+function initialOriginalForRecipe(recipeId: string): RecipeContext | null {
+  if (typeof window === "undefined") {
+    return null
+  }
+  return readRecipeRecord(recipeId)?.originalState ?? null
+}
 
 /**
- * Single source of truth: `useCoAgent` state matches the backend RecipeContext
- * (via AG-UI). Local `setState` is used only for pure-UI fields (e.g. checked
- * ingredients) or forwarding CopilotKit merges — recipe rows, servings, steps,
- * and progress always reflect `coagent.state`.
+ * Co-agent state for `/recipe/[id]`. Remount this hook when `recipeId`
+ * changes (parent should pass `key={recipeId}`).
  */
-function useRecipeCoAgent() {
-  const [hydrated, setHydrated] = useState(false)
-  const [originalState, setOriginalState] = useState<RecipeContext | null>(null)
-  const [threadId, setThreadId] = useState<string | null>(null)
-  const [state, setState] = useState<RecipeContext>(emptyRecipeContext)
+function useRecipeCoAgent(recipeId: string) {
+  useLayoutEffect(() => {
+    setActiveRecipeId(recipeId)
+    clearCopilotRunError()
+  }, [recipeId])
+
+  const { agent } = useAgent({ agentId: RECIPE_AGENT_NAME })
 
   useEffect(() => {
-    const refreshSession = () => {
-      const session = readRecipeSession()
-      setOriginalState(readOriginalRecipeContext())
-      setThreadId(session?.threadId ?? null)
-      setState(session?.state ?? emptyRecipeContext)
-      setHydrated(true)
-    }
-
-    refreshSession()
-    return subscribeToRecipeSession(refreshSession)
-  }, [])
-
-  const coagent = useCoAgent<RecipeContext>({
-    name: RECIPE_AGENT_NAME,
-    state,
-    setState,
-  })
-
-  const syncedThreadId = coagent.threadId ?? threadId
-
-  useEffect(() => {
-    if (!hydrated || !syncedThreadId || !coagent.state.recipe) {
+    if (!agent) {
       return
     }
 
-    const pending = coagent.state
+    const { unsubscribe } = agent.subscribe({
+      onRunFailed: ({ error }) => {
+        publishCopilotRunError(getUserFacingMessage(error))
+      },
+      onRunErrorEvent: ({ event }) => {
+        publishCopilotRunError(getUserFacingMessage(event))
+      },
+    })
+
+    return () => {
+      unsubscribe()
+    }
+  }, [agent])
+
+  const copilotRunError = useSyncExternalStore(
+    subscribeCopilotRunError,
+    getCopilotRunErrorSnapshot,
+    () => null
+  )
+
+  const [originalState] = useState<RecipeContext | null>(() =>
+    initialOriginalForRecipe(recipeId)
+  )
+  const [bootstrapThreadId] = useState<string | null>(() =>
+    initialThreadForRecipe(recipeId)
+  )
+  /** One snapshot per mount — do not mirror agent state in React `useState`. */
+  const [initialAgentState] = useState<RecipeContext>(() =>
+    initialStateForRecipe(recipeId)
+  )
+
+  const coagent = useCoAgent<RecipeContext>({
+    name: RECIPE_AGENT_NAME,
+    initialState: initialAgentState,
+  })
+
+  const syncedThreadId = coagent.threadId ?? bootstrapThreadId
+
+  /** Agent connect can clear state before AG-UI re-hydrates; keep upload snapshot until agent carries a recipe. */
+  const state = useMemo((): RecipeContext => {
+    const agentState = coagent.state as RecipeContext | undefined
+    if (agentState?.recipe != null) {
+      return agentState
+    }
+    if (initialAgentState.recipe != null) {
+      return initialAgentState
+    }
+    return agentState ?? emptyRecipeContext
+  }, [coagent.state, initialAgentState])
+
+  const resolveCoAgentBase = useCallback((): RecipeContext => {
+    const agentState = coagent.state as RecipeContext | undefined
+    if (agentState?.recipe != null) {
+      return agentState
+    }
+    if (initialAgentState.recipe != null) {
+      return initialAgentState
+    }
+    return agentState ?? emptyRecipeContext
+  }, [coagent.state, initialAgentState])
+
+  const hydratedForThreadRef = useRef<string | null>(null)
+  useLayoutEffect(() => {
+    if (!syncedThreadId || !initialAgentState.recipe) {
+      return
+    }
+    if (hydratedForThreadRef.current === syncedThreadId) {
+      return
+    }
+    hydratedForThreadRef.current = syncedThreadId
+    coagent.setState((prev) => {
+      const p = prev as RecipeContext | undefined
+      if (p?.recipe != null) {
+        return p
+      }
+      return initialAgentState
+    })
+  }, [coagent, coagent.setState, initialAgentState, syncedThreadId])
+
+  useEffect(() => {
+    if (!syncedThreadId || !state.recipe) {
+      return
+    }
+
+    const pending = state
     const id = window.setTimeout(() => {
       storeRecipeSession(
         {
@@ -65,27 +165,44 @@ function useRecipeCoAgent() {
     }, 200)
 
     return () => window.clearTimeout(id)
-  }, [coagent.state, hydrated, syncedThreadId])
+  }, [state, syncedThreadId])
 
-  const status: RecipeCoAgentStatus = !hydrated
-    ? "hydrating"
-    : syncedThreadId
-      ? "ready"
-      : "missing-session"
+  const status: RecipeCoAgentStatus = syncedThreadId
+    ? "ready"
+    : "missing-session"
+
+  const incompleteSession = useMemo(() => {
+    if (status !== "ready" || !syncedThreadId) {
+      return false
+    }
+    if (state.recipe) {
+      return false
+    }
+    const persisted = readRecipeSession()
+    return Boolean(
+      persisted?.threadId &&
+        persisted.threadId === syncedThreadId &&
+        !persisted.state.recipe
+    )
+  }, [state.recipe, status, syncedThreadId])
 
   const toggleIngredient = useCallback(
     (ingredientName: string) => {
       coagent.setState((previousState) => {
-        const currentState = previousState ?? emptyRecipeContext
+        const currentState =
+          previousState?.recipe != null
+            ? previousState
+            : resolveCoAgentBase()
+        const existingChecked = currentState.checked_ingredients ?? []
         const checkedIngredients = new Set(
-          currentState.checked_ingredients.map((item) => item.toLowerCase())
+          existingChecked.map((item) => item.toLowerCase())
         )
         const normalisedName = ingredientName.toLowerCase()
         const nextCheckedIngredients = checkedIngredients.has(normalisedName)
-          ? currentState.checked_ingredients.filter(
+          ? existingChecked.filter(
               (item) => item.toLowerCase() !== normalisedName
             )
-          : [...currentState.checked_ingredients, ingredientName]
+          : [...existingChecked, ingredientName]
 
         return {
           ...currentState,
@@ -93,13 +210,16 @@ function useRecipeCoAgent() {
         }
       })
     },
-    [coagent]
+    [coagent, resolveCoAgentBase]
   )
 
   const goToStep = useCallback(
     (stepIndex: number) => {
       coagent.setState((previousState) => {
-        const currentState = previousState ?? emptyRecipeContext
+        const currentState =
+          previousState?.recipe != null
+            ? previousState
+            : resolveCoAgentBase()
         const stepCount = currentState.recipe?.steps.length ?? 0
 
         if (!stepCount) {
@@ -115,54 +235,43 @@ function useRecipeCoAgent() {
         }
       })
     },
-    [coagent]
+    [coagent, resolveCoAgentBase]
   )
 
-  /**
-   * Warn only for a **persisted** thread plus saved context without a recipe.
-   * If `sessionStorage` still holds a recipe, do not show — even when Copilot
-   * has temporarily cleared `coagent.state`. If the agent has a recipe again,
-   * hide the banner regardless of a stale storage row before the next persist.
-   */
-  const incompleteSession = useMemo(() => {
-    if (status !== "ready" || !syncedThreadId) {
-      return false
-    }
-    if (coagent.state.recipe) {
-      return false
-    }
-    const persisted = readRecipeSession()
-    return Boolean(
-      persisted?.threadId && persisted.threadId === syncedThreadId && !persisted.state.recipe
-    )
-  }, [coagent.state.recipe, status, syncedThreadId])
+  const dismissCopilotRunError = useCallback(() => {
+    clearCopilotRunError()
+  }, [])
 
   return useMemo(
     () => ({
+      copilotRunError,
+      dismissCopilotRunError,
       error:
         status === "missing-session"
           ? "Upload a recipe before starting the cooking workspace."
           : null,
       incompleteSession,
-      isHydrating: status === "hydrating",
+      isHydrating: false,
       isReady: status === "ready",
       originalState,
       running: coagent.running,
       goToStep,
       setState: coagent.setState,
       start: coagent.start,
-      state: coagent.state,
+      state,
       status,
       stop: coagent.stop,
       threadId: syncedThreadId ?? null,
       toggleIngredient,
     }),
     [
+      copilotRunError,
       coagent.running,
+      dismissCopilotRunError,
       goToStep,
       coagent.setState,
       coagent.start,
-      coagent.state,
+      state,
       coagent.stop,
       incompleteSession,
       originalState,

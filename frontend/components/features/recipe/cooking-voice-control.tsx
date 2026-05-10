@@ -145,7 +145,7 @@ function CookingVoiceControl({
           type="button"
           variant="ghost"
           size="xs"
-          className="h-auto min-h-0 py-1 text-caption-bold text-stone"
+          className="h-auto min-h-0 py-1 text-caption-bold text-slate"
           onClick={stop}
         >
           Cancel

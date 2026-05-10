@@ -37,6 +37,60 @@ function parseFastApiDetail(body: unknown): string | null {
   return null
 }
 
+/** CopilotKit / AG-UI often throw plain `Error` with long provider payloads in `.message`. */
+function mapLlmProviderFaultToUserMessage(text: string): string | null {
+  const t = text.trim()
+  if (!t) {
+    return null
+  }
+
+  if (
+    /status_code:\s*429|\b429\b.*quota|RESOURCE_EXHAUSTED|quota exceeded|rate limit|free_tier|free tier|generate_content_free_tier|generativelanguage\.googleapis\.com|insufficient[_\s]quota|too many requests/i.test(
+      t
+    )
+  ) {
+    return "Chef could not reply: the AI provider quota or rate limit was reached. Wait a short while and try again, or check billing and model settings for your API key."
+  }
+
+  if (/status_code:\s*5\d\d|\b503\b|\b502\b|\b504\b|overloaded|unavailable/i.test(t)) {
+    return "Chef could not reply: the AI service is overloaded or unavailable. Try again in a moment."
+  }
+
+  if (/invalid.*api[_\s]?key|API key not valid|401\b|403\b.*permission/i.test(t)) {
+    return "Chef could not reply: the AI API key appears invalid or unauthorised. Check your backend configuration."
+  }
+
+  return null
+}
+
+function diagnosticStringFromUnknown(value: unknown, maxLen = 6000): string {
+  if (value instanceof Error) {
+    return value.message.slice(0, maxLen)
+  }
+  if (typeof value === "string") {
+    return value.slice(0, maxLen)
+  }
+  if (value && typeof value === "object") {
+    const o = value as Record<string, unknown>
+    if (typeof o.message === "string") {
+      return o.message.slice(0, maxLen)
+    }
+    if (typeof o.error === "string") {
+      return o.error.slice(0, maxLen)
+    }
+    if (o.error instanceof Error) {
+      return o.error.message.slice(0, maxLen)
+    }
+    try {
+      const s = JSON.stringify(value)
+      return (s.length > maxLen ? `${s.slice(0, maxLen)}…` : s).trim()
+    } catch {
+      return String(value).slice(0, maxLen)
+    }
+  }
+  return String(value ?? "").slice(0, maxLen)
+}
+
 /** Turn occasional backend phrases into calmer copy without dumping internals. */
 function normaliseTechnicalPhrases(message: string): string {
   const trimmed = message.trim()
@@ -125,6 +179,12 @@ function getUserFacingMessage(error: unknown): string {
     return getUserFacingApiMessage(error.status, error.body)
   }
 
+  const diagnostic = diagnosticStringFromUnknown(error)
+  const fromLlm = mapLlmProviderFaultToUserMessage(diagnostic)
+  if (fromLlm) {
+    return fromLlm
+  }
+
   if (error instanceof Error) {
     const cleaned = normaliseTechnicalPhrases(error.message)
     if (cleaned) {
@@ -137,9 +197,11 @@ function getUserFacingMessage(error: unknown): string {
 
 export {
   classifyError,
+  diagnosticStringFromUnknown,
   getUserFacingApiMessage,
   getUserFacingMessage,
   getStatusFallbackMessage,
+  mapLlmProviderFaultToUserMessage,
   parseFastApiDetail,
 }
 export type { ErrorKind }

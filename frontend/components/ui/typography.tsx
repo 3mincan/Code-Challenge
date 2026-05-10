@@ -18,13 +18,13 @@ const typographyVariants = cva("max-w-prose", {
       "body-medium": "text-body-md-medium text-charcoal",
       small: "text-body-sm text-slate",
       "small-medium": "text-body-sm-medium text-slate",
-      caption: "text-caption-bold uppercase text-stone",
+      caption: "text-caption-bold uppercase text-slate",
       label: "text-body-sm-medium text-ink",
     },
     tone: {
       default: "",
       muted: "text-slate",
-      subtle: "text-stone",
+      subtle: "text-slate",
       strong: "text-ink-deep",
       inverse: "text-on-dark",
       "inverse-muted": "text-on-dark-muted",
@@ -71,7 +71,7 @@ function Text<T extends ElementType = "p">({
 const Eyebrow = ({ className, ...props }: ComponentPropsWithoutRef<"p">) => (
   <p
     className={cn(
-      "text-caption-bold max-w-prose uppercase text-stone",
+      "text-caption-bold max-w-prose uppercase text-slate",
       className,
     )}
     {...props}

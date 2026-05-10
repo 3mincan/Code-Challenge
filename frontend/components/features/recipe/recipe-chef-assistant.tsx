@@ -175,8 +175,6 @@ function RecipeChefAssistant({ state, threadId }: RecipeChefAssistantProps) {
       toggleButton={AskChefFab}
       header={{
         title: "Chef",
-        className:
-          "cpk:border-b cpk:border-border/60 cpk:bg-canvas cpk:px-4 cpk:py-3",
       }}
       labels={{
         modalHeaderTitle: "Chef",

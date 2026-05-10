@@ -73,20 +73,20 @@ function getTotalTime(recipe: Recipe) {
   return total || null
 }
 
-function getCurrentStepIndex(state: RecipeContext) {
-  const stepCount = state.recipe?.steps.length ?? 0
+function getCurrentStepIndex(state: RecipeContext | null | undefined) {
+  const stepCount = state?.recipe?.steps.length ?? 0
 
-  if (!stepCount) {
+  if (!stepCount || !state) {
     return 0
   }
 
   return Math.min(Math.max(state.current_step, 0), stepCount - 1)
 }
 
-function getProgressPercent(state: RecipeContext) {
-  const stepCount = state.recipe?.steps.length ?? 0
+function getProgressPercent(state: RecipeContext | null | undefined) {
+  const stepCount = state?.recipe?.steps.length ?? 0
 
-  if (!stepCount) {
+  if (!stepCount || !state) {
     return 0
   }
 

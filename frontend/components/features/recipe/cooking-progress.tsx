@@ -9,7 +9,7 @@ import { getCurrentStepIndex, getProgressPercent } from "./recipe-utils"
 
 type CookingProgressProps = {
   state: RecipeContext
-  /** Dense inline layout for sticky cooking-mode chrome. */
+  /** Dense inline layout for cooking-mode sticky chrome. */
   compact?: boolean
 }
 
@@ -23,21 +23,11 @@ function CookingProgress({ state, compact = false }: CookingProgressProps) {
   const currentStepIndex = getCurrentStepIndex(state)
   const progress = getProgressPercent(state)
   const currentStep = recipe.steps[currentStepIndex]
-  const stepCount = recipe.steps.length
 
   if (compact) {
     return (
-      <div className="flex w-full min-w-0 flex-col gap-2.5">
-        <div className="flex items-baseline justify-between gap-3 text-body-sm">
-          <Text variant="small-medium" measure="none" className="truncate">
-            Step {currentStepIndex + 1} of {stepCount}
-            {state.cooking_started ? "" : " — ready"}
-          </Text>
-          <span className="shrink-0 tabular-nums text-body-sm-medium text-ink">
-            {progress}%
-          </span>
-        </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-hairline-soft">
+      <div className="flex w-full min-w-0 items-center justify-between gap-3 text-body-sm">
+        <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-hairline-soft">
           <motion.div
             className="h-full rounded-full bg-primary"
             initial={false}
@@ -45,23 +35,9 @@ function CookingProgress({ state, compact = false }: CookingProgressProps) {
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
           />
         </div>
-        {currentStep ? (
-          <motion.div
-            key={`${currentStepIndex}-${currentStep.instruction.slice(0, 40)}`}
-            initial={{ opacity: 0.72, y: 3 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <Text
-              variant="small"
-              tone="muted"
-              measure="none"
-              className="line-clamp-2"
-            >
-              {currentStep.instruction}
-            </Text>
-          </motion.div>
-        ) : null}
+        <span className="shrink-0 tabular-nums text-body-sm-medium text-ink">
+          {progress}%
+        </span>
       </div>
     )
   }
@@ -70,8 +46,9 @@ function CookingProgress({ state, compact = false }: CookingProgressProps) {
     <motion.aside
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2, duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ delay: 0.12, duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
       className="rounded-xl bg-brand-navy p-5 text-on-dark shadow-elevation-3 sm:p-6"
+      aria-label="Cooking progress"
     >
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>

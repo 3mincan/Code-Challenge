@@ -1,11 +1,12 @@
 "use client"
 
 import { AnimatePresence, motion } from "framer-motion"
-import { FileText, Upload, X } from "lucide-react"
+import { FileText, Sparkles, Upload, X } from "lucide-react"
 import { useId, useRef, useState, type DragEvent } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Panel } from "@/components/ui/panel"
+import { Surface } from "@/components/ui/surface"
 import { TactileButton } from "@/components/ui/tactile-button"
 import { Cluster, Stack } from "@/components/ui/section"
 import { transitions } from "@/components/ui/motion"
@@ -40,6 +41,7 @@ function UploadDropzone({
   onUpload,
 }: UploadDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null)
+  const introId = useId()
   const hintId = useId()
   const [isDragging, setIsDragging] = useState(false)
 
@@ -61,17 +63,9 @@ function UploadDropzone({
   return (
     <div className="space-y-5">
       <motion.div
-        role="button"
-        tabIndex={0}
-        aria-label="Upload recipe file"
-        aria-describedby={hintId}
-        onClick={openPicker}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault()
-            openPicker()
-          }
-        }}
+        role="region"
+        aria-label="Recipe file upload. Use the Upload button or drag a file into this area."
+        aria-describedby={`${introId} ${hintId}`}
         onDragOver={(event) => {
           event.preventDefault()
           if (!disabled) {
@@ -80,13 +74,9 @@ function UploadDropzone({
         }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
-        whileHover={
-          disabled ? undefined : { scale: 1.004, transition: transitions.quick }
-        }
-        whileTap={disabled ? undefined : { scale: 0.996 }}
         className={cn(
-          "motion-standard cursor-pointer rounded-2xl border border-dashed bg-canvas p-6 text-left shadow-elevation-2 transition-[background-color,border-color,box-shadow,transform] sm:p-8",
-          "min-h-[clamp(16rem,48dvh,24rem)] touch-target flex flex-col justify-between gap-6 sm:min-h-[22rem] sm:gap-8 md:min-h-[24rem]",
+          "motion-standard rounded-2xl border border-dashed bg-canvas p-6 text-left shadow-elevation-2 transition-[background-color,border-color,box-shadow] sm:p-8",
+          "min-h-[clamp(14rem,40dvh,22rem)] flex flex-col justify-between gap-6 sm:min-h-[19rem] sm:gap-8 md:min-h-[21rem]",
           isDragging
             ? "border-primary bg-tint-lavender shadow-elevation-3"
             : "border-hairline-strong",
@@ -98,7 +88,7 @@ function UploadDropzone({
           ref={inputRef}
           type="file"
           className="sr-only"
-          accept=".pdf,.txt,.md,application/pdf,text/plain"
+          accept=".pdf,.txt,.md,.png,.jpg,.jpeg,.webp,.gif,application/pdf,text/plain,image/png,image/jpeg,image/webp,image/gif"
           disabled={disabled}
           onChange={(event) => {
             onFileSelect(event.target.files?.item(0) ?? null)
@@ -106,20 +96,54 @@ function UploadDropzone({
           }}
         />
 
-        <Stack className="gap-5">
-          <div className="flex size-14 items-center justify-center rounded-xl bg-tint-yellow text-ink shadow-elevation-1">
-            <Upload className="size-6" />
+        <Stack className="gap-4">
+          <Button
+            type="button"
+            size="lg"
+            className="w-full touch-manipulation sm:w-auto sm:min-w-[12rem]"
+            disabled={disabled}
+            onClick={() => openPicker()}
+          >
+            <Upload
+              data-icon="inline-start"
+              className="size-6"
+              aria-hidden
+            />
+            Upload
+          </Button>
+
+          <div id={introId} className="min-w-0">
+            <Text
+              variant="small"
+              measure="none"
+              className="max-w-none text-slate"
+            >
+              The companion separates ingredients from the method for you. It
+              stays most accurate when those two are already easy to
+              distinguish—ideally a clear list plus short, ordered steps
+              (bullets or numbers both help).
+            </Text>
           </div>
-          <Stack className="gap-3">
-            <Text as="h2" variant="h2" measure="lg">
-              Drop in a recipe, or tap to choose one.
-            </Text>
-            <Text measure="lg" id={hintId}>
-              Upload a PDF or plain text recipe. The companion will read it,
-              structure the ingredients and steps, then prepare your cooking
-              workspace.
-            </Text>
-          </Stack>
+
+          <Surface
+            variant="cream"
+            className="flex items-start gap-4 p-5 text-charcoal"
+          >
+            <Sparkles
+              className="mt-1 size-5 shrink-0 text-brand-orange"
+              aria-hidden
+            />
+            <div id={hintId} className="min-w-0 space-y-2">
+              <Text
+                variant="small"
+                measure="none"
+                className="max-w-none text-slate"
+              >
+                Text files work best when they contain ingredients and method
+                steps.
+              </Text>
+            </div>
+          </Surface>
         </Stack>
 
         <AnimatePresence mode="wait">
@@ -160,19 +184,7 @@ function UploadDropzone({
                 </Cluster>
               </Panel>
             </motion.div>
-          ) : (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="grid gap-3 text-body-sm text-slate sm:grid-cols-3"
-            >
-              <span>PDF files</span>
-              <span>Plain text</span>
-              <span>Ready for cooking</span>
-            </motion.div>
-          )}
+          ) : null}
         </AnimatePresence>
       </motion.div>
 
@@ -189,7 +201,11 @@ function UploadDropzone({
                 transition={transitions.quick}
                 className="rounded-xl border border-destructive/35 bg-destructive/8 px-4 py-3"
               >
-                <Text variant="small-medium" measure="none" className="text-ink">
+                <Text
+                  variant="small-medium"
+                  measure="none"
+                  className="text-ink"
+                >
                   Could not finish that upload
                 </Text>
                 <Text
@@ -213,18 +229,7 @@ function UploadDropzone({
                   </div>
                 ) : null}
               </motion.div>
-            ) : (
-              <motion.p
-                key="hint"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-body-sm text-stone"
-              >
-                Text files work best when they contain ingredients and method
-                steps.
-              </motion.p>
-            )}
+            ) : null}
           </AnimatePresence>
         </div>
         <TactileButton
@@ -233,7 +238,7 @@ function UploadDropzone({
           disabled={!file || disabled}
           onClick={onUpload}
         >
-          Parse recipe
+          Continue with this file
         </TactileButton>
       </div>
     </div>

@@ -1,7 +1,8 @@
 "use client"
 
 import { AnimatePresence, motion } from "framer-motion"
-import { ChefHat, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react"
+import { ChefHat, ChevronDown, ChevronUp, RotateCcw } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 import { AppShell, ShellMain } from "@/components/layout/app-shell"
@@ -11,7 +12,6 @@ import { TactileButton } from "@/components/ui/tactile-button"
 import { Container, Section } from "@/components/ui/section"
 import { Text } from "@/components/ui/typography"
 import { cn } from "@/lib/utils"
-import { clearRecipeSession } from "@/lib/recipe-session"
 import type { RecipeContext } from "@/types/recipe"
 
 import { CookingProgress } from "./cooking-progress"
@@ -39,6 +39,7 @@ function RecipeExperience({
   onToggleIngredient,
   onGoToStep,
 }: RecipeExperienceProps) {
+  const router = useRouter()
   const [cookingMode, setCookingMode] = useState(false)
   const recipe = state.recipe
 
@@ -51,19 +52,22 @@ function RecipeExperience({
     recipe.steps[currentStepIndex]?.instruction ?? ""
 
   const sidebar = (
+    <IngredientsPanel
+      checkedIngredients={state.checked_ingredients}
+      ingredients={recipe.ingredients}
+      onToggleIngredient={onToggleIngredient}
+      originalIngredients={
+        originalState?.recipe?.ingredients ?? recipe.ingredients
+      }
+      scaledServings={state.scaled_servings}
+      agentBusy={running}
+    />
+  )
+
+  const recipeMetaAndIngredients = (
     <div className="space-y-6">
       <RecipeHeader recipe={recipe} running={running} />
-      {!cookingMode ? <CookingProgress state={state} /> : null}
-      <IngredientsPanel
-        checkedIngredients={state.checked_ingredients}
-        ingredients={recipe.ingredients}
-        onToggleIngredient={onToggleIngredient}
-        originalIngredients={
-          originalState?.recipe?.ingredients ?? recipe.ingredients
-        }
-        scaledServings={state.scaled_servings}
-        agentBusy={running}
-      />
+      {sidebar}
     </div>
   )
 
@@ -83,100 +87,118 @@ function RecipeExperience({
                 <motion.div
                   key="cooking"
                   {...panelCrossfade}
-                  className="mx-auto max-w-2xl space-y-5 pb-[max(5rem,env(safe-area-inset-bottom,0px)+2.5rem)] pt-2 sm:space-y-6 sm:pb-[max(5.5rem,env(safe-area-inset-bottom,0px)+2.5rem)]"
+                  className="mx-auto max-w-2xl space-y-4 pb-[max(5rem,env(safe-area-inset-bottom,0px)+2.5rem)] pt-1 sm:space-y-5 sm:pb-[max(5.5rem,env(safe-area-inset-bottom,0px)+2.5rem)]"
                 >
-                <div
-                  role="region"
-                  aria-label="Cooking mode controls"
-                  className={cn(
-                    "sticky top-0 z-30 -mx-2 space-y-3 sm:-mx-4 md:-mx-6"
-                  )}
-                >
-                  <div className="rounded-2xl border border-hairline/80 bg-canvas/95 px-2 py-2 shadow-elevation-2 backdrop-blur-md supports-[backdrop-filter]:bg-canvas/90">
-                    <div className="flex items-start gap-2 sm:items-center sm:gap-2">
-                      <CookingVoiceControl
-                        currentStepIndex={currentStepIndex}
-                        stepCount={recipe.steps.length}
-                        currentStepInstruction={currentStepInstruction}
-                        onGoToStep={onGoToStep}
-                        agentBusy={running}
-                      />
-                      <div className="flex min-w-0 flex-1 items-center gap-1 sm:gap-2">
-                        <TactileButton
+                  <section
+                    aria-label="Cooking mode controls"
+                    className="sticky top-0 z-30 -mx-2 space-y-3 sm:-mx-4 md:-mx-6"
+                  >
+                    <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2.5 px-1 sm:px-0">
+                      <Text
+                        as="p"
+                        variant="caption"
+                        measure="none"
+                        className="font-semibold uppercase tracking-[0.14em]"
+                      >
+                        Cooking
+                      </Text>
+                      <div className="flex flex-wrap items-center justify-end gap-2">
+                        <Button
                           type="button"
                           variant="outline"
-                          size="icon"
-                          className="size-12 shrink-0 touch-manipulation rounded-xl"
-                          aria-label="Previous step"
-                          disabled={currentStepIndex <= 0}
-                          onClick={() => onGoToStep(currentStepIndex - 1)}
+                          size="sm"
+                          className="min-h-10 touch-manipulation sm:min-h-9"
+                          onClick={() => {
+                            setCookingMode(false)
+                          }}
                         >
-                          <ChevronLeft className="size-6" strokeWidth={2} />
-                        </TactileButton>
-                        <div className="min-w-0 flex-1 px-1 text-center">
+                          Exit cooking mode
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="min-h-10 touch-manipulation text-slate sm:min-h-9"
+                          onClick={() => {
+                            router.push("/")
+                          }}
+                        >
+                          <RotateCcw data-icon="inline-start" aria-hidden />
+                          New recipe
+                        </Button>
+                      </div>
+                    </header>
+
+                    <div className="overflow-hidden rounded-[1.25rem] border border-hairline/80 bg-canvas/95 shadow-elevation-2 backdrop-blur-md supports-[backdrop-filter]:bg-canvas/88">
+                      <div className="flex items-center justify-between gap-2 border-b border-hairline-soft/80 p-3 sm:gap-4 sm:p-4">
+                        <CookingVoiceControl
+                          currentStepIndex={currentStepIndex}
+                          stepCount={recipe.steps.length}
+                          currentStepInstruction={currentStepInstruction}
+                          onGoToStep={onGoToStep}
+                          agentBusy={running}
+                          className="shrink-0"
+                        />
+                        <div className="min-w-0 flex-1 px-1 text-center sm:px-2">
                           <Text
                             as="p"
-                            variant="small-medium"
+                            variant="h4"
                             measure="none"
-                            className="truncate text-ink"
+                            className="line-clamp-2 text-balance font-semibold leading-snug tracking-tight text-ink"
                           >
                             {recipe.title}
                           </Text>
-                          <Text variant="caption" tone="muted" measure="none">
-                            Step {currentStepIndex + 1} of{" "}
-                            {recipe.steps.length}
-                          </Text>
                         </div>
-                        <TactileButton
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className="size-12 shrink-0 touch-manipulation rounded-xl"
-                          aria-label="Next step"
-                          disabled={
-                            currentStepIndex >= recipe.steps.length - 1
-                          }
-                          onClick={() => onGoToStep(currentStepIndex + 1)}
-                        >
-                          <ChevronRight className="size-6" strokeWidth={2} />
-                        </TactileButton>
+                        <div className="flex shrink-0 flex-col justify-center gap-1.5">
+                          <TactileButton
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="size-11 touch-manipulation rounded-xl sm:size-12"
+                            aria-label="Previous step"
+                            disabled={currentStepIndex <= 0}
+                            onClick={() => onGoToStep(currentStepIndex - 1)}
+                          >
+                            <ChevronUp
+                              className="size-5 sm:size-6"
+                              strokeWidth={2}
+                              aria-hidden
+                            />
+                          </TactileButton>
+                          <TactileButton
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="size-11 touch-manipulation rounded-xl sm:size-12"
+                            aria-label="Next step"
+                            disabled={
+                              currentStepIndex >= recipe.steps.length - 1
+                            }
+                            onClick={() => onGoToStep(currentStepIndex + 1)}
+                          >
+                            <ChevronDown
+                              className="size-5 sm:size-6"
+                              strokeWidth={2}
+                              aria-hidden
+                            />
+                          </TactileButton>
+                        </div>
+                      </div>
+                      <div className="border-b border-hairline-soft/65 bg-canvas/55 px-3 py-2.5 sm:px-4">
+                        <CookingProgress state={state} compact />
+                      </div>
+                      <div className="bg-surface-soft/15 px-0.5 pb-1 pt-0 sm:px-1 sm:pb-2">
+                        <StepsPanel
+                          currentStepIndex={currentStepIndex}
+                          steps={recipe.steps}
+                          immersive
+                          embedded
+                          agentBusy={running}
+                          onStepChange={onGoToStep}
+                        />
                       </div>
                     </div>
-                    <div className="mt-3 border-t border-hairline-soft px-1 pt-3">
-                      <CookingProgress state={state} compact />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-center gap-2 px-1 sm:gap-3">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="min-h-12 touch-manipulation sm:min-h-11"
-                      onClick={() => {
-                        setCookingMode(false)
-                      }}
-                    >
-                      Exit cooking mode
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="min-h-12 touch-manipulation text-slate sm:min-h-11"
-                      onClick={clearRecipeSession}
-                    >
-                      <RotateCcw data-icon="inline-start" />
-                      New recipe
-                    </Button>
-                  </div>
-                </div>
-
-                <StepsPanel
-                  currentStepIndex={currentStepIndex}
-                  steps={recipe.steps}
-                  immersive
-                  agentBusy={running}
-                  onStepChange={onGoToStep}
-                />
+                  </section>
 
                 <details
                   className={cn(
@@ -196,7 +218,7 @@ function RecipeExperience({
                     </span>
                   </summary>
                   <div className="border-t border-hairline-soft px-5 py-6">
-                    {sidebar}
+                    {recipeMetaAndIngredients}
                   </div>
                 </details>
                 </motion.div>
@@ -220,20 +242,27 @@ function RecipeExperience({
                         <ChefHat data-icon="inline-start" />
                         Cooking mode
                       </Button>
-                      <Button variant="ghost" onClick={clearRecipeSession}>
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          router.push("/")
+                        }}
+                      >
                         <RotateCcw data-icon="inline-start" />
                         Upload another
                       </Button>
                     </div>
                   </div>
 
+                  <RecipeHeader recipe={recipe} running={running} />
+
                   <div className="grid gap-6 max-md:gap-8 md:gap-8 lg:grid-cols-[minmax(16rem,0.85fr)_minmax(0,1.15fr)] lg:items-start lg:gap-10">
-                    <div className="order-2 min-w-0 space-y-6 lg:order-1">
+                    <div className="order-2 min-w-0 lg:order-1">
                       {sidebar}
                     </div>
 
                     <motion.div
-                      className="order-1 min-w-0 lg:order-2"
+                      className="order-1 flex min-w-0 flex-col gap-6 lg:order-2"
                       initial={{ opacity: 0, y: 18 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{
@@ -242,10 +271,12 @@ function RecipeExperience({
                         ease: [0.16, 1, 0.3, 1],
                       }}
                     >
+                      <CookingProgress state={state} />
                       <StepsPanel
                         currentStepIndex={currentStepIndex}
                         steps={recipe.steps}
                         agentBusy={running}
+                        onStepChange={onGoToStep}
                       />
                     </motion.div>
                   </div>

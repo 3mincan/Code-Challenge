@@ -3,7 +3,11 @@
 import { AnimatePresence, motion } from "framer-motion"
 import { Check, RefreshCw, Replace } from "lucide-react"
 
-import { motionEasings, springTactile, tactilePointer } from "@/components/ui/motion"
+import {
+  motionEasings,
+  springTactile,
+  tactilePointer,
+} from "@/components/ui/motion"
 
 import { Text } from "@/components/ui/typography"
 import { cn } from "@/lib/utils"
@@ -42,7 +46,6 @@ function IngredientsPanel({
 
   return (
     <motion.section
-      layout
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.08, duration: 0.36, ease: motionEasings.emphasized }}
@@ -68,22 +71,6 @@ function IngredientsPanel({
           </Text>
         </div>
 
-        <div className="space-y-2">
-          <div className="h-2 overflow-hidden rounded-full bg-hairline-soft">
-            <motion.div
-              className="h-full rounded-full bg-brand-green"
-              initial={{ width: 0 }}
-              animate={{ width: `${completion}%` }}
-              transition={{ duration: 0.35, ease: motionEasings.emphasized }}
-            />
-          </div>
-          <Text variant="small" tone="muted" measure="none">
-            {completion === 100
-              ? "Everything is ready."
-              : `${completion}% gathered`}
-          </Text>
-        </div>
-
         <AnimatePresence initial={false} mode="popLayout">
           {scaledServings ? (
             <motion.div
@@ -98,9 +85,30 @@ function IngredientsPanel({
             </motion.div>
           ) : null}
         </AnimatePresence>
+
+        <div
+          className={cn(
+            "relative space-y-2 rounded-2xl border border-hairline/80 bg-canvas/95 p-4 shadow-elevation-2",
+            "backdrop-blur-sm supports-[backdrop-filter]:bg-canvas/90"
+          )}
+        >
+          <div className="h-2 overflow-hidden rounded-full bg-hairline-soft">
+            <motion.div
+              className="h-full rounded-full bg-brand-green"
+              initial={false}
+              animate={{ width: `${completion}%` }}
+              transition={{ duration: 0.35, ease: motionEasings.emphasized }}
+            />
+          </div>
+          <Text variant="small" tone="muted" measure="none">
+            {completion === 100
+              ? "Everything is ready."
+              : `${completion}% gathered`}
+          </Text>
+        </div>
       </div>
 
-      <motion.ul layout className="space-y-3">
+      <ul className="space-y-3">
         {ingredients.map((ingredient, index) => {
           const original = originalIngredients[index]
           const isChecked = checked.has(ingredient.name.toLowerCase())
@@ -108,11 +116,7 @@ function IngredientsPanel({
           const isSubstitution = didIngredientSubstitute(ingredient, original)
 
           return (
-            <motion.li
-              layout="position"
-              transition={{ layout: { duration: 0.32, ease: [0.16, 1, 0.3, 1] } }}
-              key={`ingredient-row-${index}`}
-            >
+            <li key={`ingredient-row-${index}`}>
               <motion.button
                 type="button"
                 role="checkbox"
@@ -121,8 +125,8 @@ function IngredientsPanel({
                 {...tactilePointer}
                 className={
                   isChecked
-                    ? "motion-standard flex min-h-16 w-full items-start gap-3 rounded-xl border border-brand-green bg-tint-mint p-3 text-left shadow-elevation-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
-                    : "motion-standard flex min-h-16 w-full items-start gap-3 rounded-xl border border-transparent bg-surface-soft p-3 text-left hover:border-hairline-strong hover:bg-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
+                    ? "motion-standard relative z-[1] flex min-h-16 w-full touch-manipulation items-start gap-3 rounded-xl border border-brand-green bg-tint-mint p-3 text-left shadow-elevation-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
+                    : "motion-standard relative z-[1] flex min-h-16 w-full touch-manipulation items-start gap-3 rounded-xl border border-transparent bg-surface-soft p-3 text-left hover:border-hairline-strong hover:bg-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
                 }
               >
                 <span
@@ -193,10 +197,10 @@ function IngredientsPanel({
                   </span>
                 </span>
               </motion.button>
-            </motion.li>
+            </li>
           )
         })}
-      </motion.ul>
+      </ul>
     </motion.section>
   )
 }

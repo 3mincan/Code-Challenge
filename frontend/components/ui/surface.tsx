@@ -69,7 +69,7 @@ const badgeVariants = cva(
           "rounded-sm bg-tint-lavender px-2 py-0.5 text-brand-purple-800",
         "tag-orange":
           "rounded-sm bg-tint-peach px-2 py-0.5 text-[var(--brand-orange-deep)]",
-        "tag-green": "rounded-sm bg-tint-mint px-2 py-0.5 text-brand-green",
+        "tag-green": "rounded-sm bg-tint-mint px-2 py-0.5 text-charcoal",
       },
     },
     defaultVariants: {
