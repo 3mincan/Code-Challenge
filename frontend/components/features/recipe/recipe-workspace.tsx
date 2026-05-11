@@ -111,7 +111,7 @@ function RecipeWorkspaceLoaded({ recipeId }: { recipeId: string }) {
       ) : null}
       {error ? (
         <div className="border-b border-destructive/30 bg-destructive/10 px-4 py-3">
-          <Container>
+          <Container className="flex min-h-11 items-center">
             <Text variant="small-medium" measure="none">
               {error}
             </Text>
@@ -123,7 +123,7 @@ function RecipeWorkspaceLoaded({ recipeId }: { recipeId: string }) {
           className="border-b border-destructive/25 bg-destructive/10 px-4 py-3"
           role="alert"
         >
-          <Container className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+          <Container className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <Text variant="small-medium" measure="none" className="min-w-0">
               {copilotRunError}
             </Text>
@@ -131,7 +131,7 @@ function RecipeWorkspaceLoaded({ recipeId }: { recipeId: string }) {
               type="button"
               variant="outline"
               size="sm"
-              className="shrink-0 self-start touch-manipulation"
+              className="shrink-0 touch-manipulation"
               onClick={() => dismissCopilotRunError()}
             >
               Dismiss

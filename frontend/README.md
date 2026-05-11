@@ -32,7 +32,12 @@ Open http://localhost:3000. From the monorepo root you can use **`./scripts/dev.
 
 ## Environment
 
-`NEXT_PUBLIC_API_BASE_URL` — absolute API base (no trailing slash required). Read in `config/env.ts`. The Next route `app/api/copilotkit/route.ts` proxies the CopilotKit runtime to `{apiBaseUrl}/copilotkit`.
+| Variable | Where it runs | Purpose |
+|----------|----------------|---------|
+| `NEXT_PUBLIC_API_BASE_URL` | Browser | Absolute Python API origin for uploads and client `apiFetch`; read in `config/env.ts`. |
+| `API_INTERNAL_BASE_URL` | Next.js server only | Same Python API, but reachable **from inside the frontend container**. If unset, the CopilotKit proxy falls back to `NEXT_PUBLIC_API_BASE_URL`. |
+
+The Next route `app/api/copilotkit/route.ts` proxies Chef chat to `{API_INTERNAL_BASE_URL or NEXT_PUBLIC}/copilotkit`. On Dokploy/Docker Compose, `NEXT_PUBLIC_*` often points at a public HTTPS origin while `API_INTERNAL_*` uses the Compose service hostname (for example `http://backend:8000`). Using only `localhost:8000` on the server usually yields `ECONNREFUSED` because nothing listens there inside the frontend container.
 
 ## Source layout (high level)
 

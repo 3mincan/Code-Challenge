@@ -188,7 +188,7 @@ function UploadDropzone({
         </AnimatePresence>
       </motion.div>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <div className="min-w-0 flex-1 space-y-3">
           <AnimatePresence mode="wait">
             {error ? (
