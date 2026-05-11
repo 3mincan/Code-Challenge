@@ -60,6 +60,19 @@ function mapLlmProviderFaultToUserMessage(text: string): string | null {
     return "Chef could not reply: the AI API key appears invalid or unauthorised. Check your backend configuration."
   }
 
+  /** Wrong origin/path: server proxied to Next.js instead of FastAPI (expects …/copilotkit on Python). */
+  if (
+    /<!DOCTYPE\s+html|<title>\s*404:?\s*This page could not be found/i.test(t) ||
+    /_next\/static\/chunks|next-error-h1|"payload":\s*'<!DOCTYPE/i.test(t)
+  ) {
+    return (
+      "Chef could not reach the Python backend: the response was a Next.js HTML page (often 404). " +
+      "Check production env: NEXT_PUBLIC_API_BASE_URL and API_INTERNAL_BASE_URL must be the FastAPI origin " +
+      "(with /upload and /copilotkit), not the Next.js site URL. Inside Docker, API_INTERNAL_BASE_URL " +
+      "should use the backend service hostname (for example http://backend:8000)."
+    )
+  }
+
   return null
 }
 
@@ -128,10 +141,29 @@ function getStatusFallbackMessage(status: number): string | null {
   return null
 }
 
+function looksLikeNextHtml404(body: unknown): boolean {
+  if (typeof body !== "string") {
+    return false
+  }
+  const s = body.slice(0, 4000)
+  return (
+    /<!DOCTYPE\s+html/i.test(s) &&
+    (/_next\/static|next-error-h1|This page could not be found/i.test(s) ||
+      /<title>\s*404/i.test(s))
+  )
+}
+
 function getUserFacingApiMessage(status: number, body: unknown): string {
   const fromBody = parseFastApiDetail(body)
   if (fromBody) {
     return fromBody
+  }
+
+  if (looksLikeNextHtml404(body)) {
+    return (
+      "The upload URL returned a web page instead of the Python API. " +
+      "Set NEXT_PUBLIC_API_BASE_URL to your FastAPI origin (where /upload exists), not your Next.js URL."
+    )
   }
 
   return (
